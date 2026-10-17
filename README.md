@@ -38,8 +38,8 @@ ready to drag onto your desktop or into any app.
 
 - **Lives in the menu bar.** One click to start or stop. While it's running, the icon shows a signal.
 
-  <img src="assets/menubar-stopped.png" width="36" alt="Stopped"> stopped &nbsp;&nbsp;
-  <img src="assets/menubar-running.png" width="36" alt="Running"> running
+  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/menubar-stopped-dark.png"><img src="assets/menubar-stopped.png" width="36" alt="Stopped"></picture> stopped &nbsp;&nbsp;
+  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/menubar-running-dark.png"><img src="assets/menubar-running.png" width="36" alt="Running"></picture> running
 - **Works with phones from 2007 onwards**, using the two routes above.
 - **Photos and videos**, including long videos. Tested with 60 MB files.
 - **A thumbnail grid in the menu.** Switch between *This session* and *All photos*, drag thumbnails out to

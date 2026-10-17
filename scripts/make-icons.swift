@@ -183,5 +183,11 @@ try? fm.createDirectory(atPath: "assets", withIntermediateDirectories: true)
 write(render(512, appIcon), "assets/icon.png")
 for (name, running) in [("menubar-stopped", false), ("menubar-running", true)] {
     write(render(144) { menuBarPhone($0, running: running) }, "assets/\(name).png")
+    // White version for GitHub's dark theme (the README picks one with <picture>).
+    write(render(144) { s in
+        menuBarPhone(s, running: running)
+        NSColor.white.set()
+        NSRect(x: 0, y: 0, width: s, height: s).fill(using: .sourceAtop)
+    }, "assets/\(name)-dark.png")
 }
 print("Icons written to Resources/ and assets/")
