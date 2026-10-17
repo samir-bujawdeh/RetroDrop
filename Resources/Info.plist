@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key><string>RetroDrop</string>
+  <key>CFBundleDisplayName</key><string>RetroDrop</string>
+  <key>CFBundleIdentifier</key><string>io.github.samir-bujawdeh.RetroDrop</string>
+  <key>CFBundleExecutable</key><string>RetroDrop</string>
+  <key>CFBundleIconFile</key><string>AppIcon</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>__VERSION__</string>
+  <key>CFBundleVersion</key><string>__BUILD__</string>
+  <key>LSMinimumSystemVersion</key><string>14.0</string>
+  <key>LSApplicationCategoryType</key><string>public.app-category.photography</string>
+  <key>LSUIElement</key><true/>
+  <key>NSHumanReadableCopyright</key><string>Free and open source (MIT License).</string>
+  <key>NSLocalNetworkUsageDescription</key>
+  <string>RetroDrop receives photos and videos from phones on your Wi-Fi network.</string>
+</dict>
+</plist>
