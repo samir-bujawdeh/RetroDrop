@@ -24,9 +24,13 @@ RetroDrop turns your Mac into a tiny server on your home Wi‑Fi that old phones
 Everything lands in a folder on your Mac, and the newest arrivals show up right in the menu bar,
 ready to drag onto your desktop or into any app.
 
+<p align="center">
+  <img src="assets/screenshot-menu.png" width="320" alt="The RetroDrop menu: server running, the Safari and mail addresses, and a grid of received photos and videos">
+</p>
+
 ## Features
 
-- **Lives in the menu bar.** One click to start or stop. The icon fills in while it's running.
+- **Lives in the menu bar.** One click to start or stop. While it's running, the icon shows a signal.
 
   <img src="assets/menubar-stopped.png" width="36" alt="Stopped"> stopped &nbsp;&nbsp;
   <img src="assets/menubar-running.png" width="36" alt="Running"> running
