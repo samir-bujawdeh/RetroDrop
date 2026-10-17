@@ -19,12 +19,14 @@ All tests should pass. Then quit that copy and try a real phone if you can.
 
 ## 3. Build and publish
 
-`scripts/build.sh` creates `dist/RetroDrop-<version>.zip`. Create a GitHub release tagged `v<version>`,
-paste the changelog entry, and attach the zip.
+`scripts/build.sh` creates `dist/RetroDrop-<version>.zip` and a version-free copy, `dist/RetroDrop.zip`.
+Create a GitHub release tagged `v<version>`, paste the changelog entry, and attach **both** zips.
+The README's download button links to `releases/latest/download/RetroDrop.zip`, so it only keeps
+working if every release includes `RetroDrop.zip`.
 
 ```bash
 git tag v$(cat VERSION) && git push --tags
-gh release create v$(cat VERSION) dist/RetroDrop-$(cat VERSION).zip --notes-file <(sed -n '/^## /,$p' CHANGELOG.md | awk 'NR>1 && /^## /{exit} 1')
+gh release create v$(cat VERSION) dist/RetroDrop-$(cat VERSION).zip dist/RetroDrop.zip --notes-file <(sed -n '/^## /,$p' CHANGELOG.md | awk 'NR>1 && /^## /{exit} 1')
 ```
 
 ## Optional: sign and notarize

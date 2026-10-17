@@ -42,6 +42,10 @@ ZIP="dist/RetroDrop-$VERSION.zip"
 rm -f "$ZIP"
 ditto -c -k --norsrc --noextattr --keepParent "$APP" "$ZIP"  # no stray ._ metadata files
 
+# Same file under a version-free name, so the README's
+# releases/latest/download/RetroDrop.zip link always serves the newest release.
+cp "$ZIP" dist/RetroDrop.zip
+
 echo "==> Built $APP"
-echo "==> Packaged $ZIP"
+echo "==> Packaged $ZIP and dist/RetroDrop.zip"
 lipo -archs "$APP/Contents/MacOS/RetroDrop"

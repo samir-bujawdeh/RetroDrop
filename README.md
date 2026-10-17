@@ -9,6 +9,12 @@
   A free menu bar app for people who still shoot with an iPhone 3GS, iPhone 4 and friends.
 </p>
 
+<p align="center">
+  <a href="https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.zip"><img src="assets/download-button.svg" width="260" alt="Download RetroDrop for Mac"></a>
+  <br>
+  <sub><a href="#install">Install steps</a> · <a href="docs/SETUP.md">Setup guide</a> · <a href="https://github.com/samir-bujawdeh/RetroDrop/releases">All releases</a></sub>
+</p>
+
 ---
 
 Old iPhones take photos with a look modern phones can't fake, but getting those photos *off* them has
@@ -65,7 +71,7 @@ If you try another model, please open an issue and tell us how it went!
 
 ## Install
 
-1. Download `RetroDrop-x.y.z.zip` from the [Releases](../../releases) page and double-click it to unzip.
+1. **[Download RetroDrop](https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.zip)** and double-click the zip to unzip it.
 2. Drag **RetroDrop** into your **Applications** folder.
 3. Open it. Because RetroDrop is a free app that isn't registered with Apple, macOS will block the
    first launch. To allow it:
