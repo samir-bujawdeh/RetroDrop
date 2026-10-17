@@ -19,15 +19,28 @@ kinds of old iPhone. If you get stuck, jump to [Troubleshooting](#troubleshootin
 1. **[Download RetroDrop](https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg)**. You always get the latest version.
 2. Open the downloaded **RetroDrop.dmg**. In the window that appears, drag **RetroDrop** onto the
    **Applications** folder, then eject the RetroDrop disk (in Finder's sidebar or on the desktop).
+
+   <img src="../assets/install/1-open-dmg.png" width="460" alt="The RetroDrop disk image window: drag RetroDrop onto Applications">
+
 3. Double-click RetroDrop to open it.
 
-**"RetroDrop Not Opened" / "Apple could not verify…"**
-This appears because RetroDrop is a free app that isn't registered with Apple. To allow it once:
+**"RetroDrop Not Opened": allowing it the first time**
 
-1. Click **Done** on the message.
-2. Open **System Settings → Privacy & Security**.
-3. Scroll down to the message about RetroDrop and click **Open Anyway**.
-4. Enter your password and click **Open**.
+macOS warns about RetroDrop because it's a free app that isn't notarized by Apple yet. Notarization
+requires a paid Apple membership, and nothing was found wrong with the app. You only do this once:
+
+1. On the warning, click **Done**, *not* Move to Trash.
+
+   <img src="../assets/install/2-click-done.png" width="420" alt="The “RetroDrop Not Opened” message, with Done highlighted">
+
+2. Open **System Settings → Privacy & Security**, scroll down to **Security**, and click
+   **Open Anyway** next to the RetroDrop message.
+
+   <img src="../assets/install/3-open-anyway-settings.png" width="560" alt="Privacy & Security settings, with the Open Anyway button highlighted">
+
+3. In the confirmation, click **Open Anyway**, then enter your password or use Touch ID if asked.
+
+   <img src="../assets/install/4-open-anyway-confirm.png" width="420" alt="The “Open RetroDrop?” confirmation, with Open Anyway highlighted">
 
 <details>
 <summary>Prefer the Terminal?</summary>

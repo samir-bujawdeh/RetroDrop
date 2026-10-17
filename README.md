@@ -71,16 +71,40 @@ If you try another model, please open an issue and tell us how it went!
 
 ## Install
 
-1. **[Download RetroDrop](https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg)** and open the downloaded `RetroDrop.dmg`.
-2. In the window that appears, drag **RetroDrop** onto **Applications**. Then eject the RetroDrop disk.
-3. Open it. Because RetroDrop is a free app that isn't registered with Apple, macOS will block the
-   first launch. To allow it:
-   - Click **Done** on the warning.
-   - Open **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to
-     the RetroDrop message. Confirm with your password.
-4. Look for the phone icon in your menu bar.
-5. If macOS asks whether RetroDrop may **accept incoming network connections**, click **Allow**. That's
-   how the phone reaches it.
+**1. [Download RetroDrop](https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg)**
+and open the downloaded `RetroDrop.dmg`. Drag **RetroDrop** onto **Applications**, then eject the
+RetroDrop disk.
+
+<img src="assets/install/1-open-dmg.png" width="460" alt="The RetroDrop disk image window: drag RetroDrop onto Applications">
+
+**2. Open RetroDrop from Applications.** The first time, macOS stops it with a warning.
+That's expected (see [why](#why-does-macos-warn-about-retrodrop)). Click **Done**, *not* Move to Trash.
+
+<img src="assets/install/2-click-done.png" width="420" alt="The “RetroDrop Not Opened” message, with Done highlighted">
+
+**3. Open System Settings → Privacy & Security** and scroll down to **Security**. Next to
+*“RetroDrop” was blocked to protect your Mac*, click **Open Anyway**.
+
+<img src="assets/install/3-open-anyway-settings.png" width="560" alt="Privacy & Security settings, with the Open Anyway button highlighted">
+
+**4. Click Open Anyway** in the confirmation that appears, and enter your password or use Touch ID
+if asked.
+
+<img src="assets/install/4-open-anyway-confirm.png" width="420" alt="The “Open RetroDrop?” confirmation, with Open Anyway highlighted">
+
+**5. Done!** Look for the phone icon in your menu bar. If macOS asks whether RetroDrop may
+**accept incoming network connections**, click **Allow**. That's how your phone reaches it.
+
+You only need to do steps 2–4 once. After that, RetroDrop opens like any other app.
+
+### Why does macOS warn about RetroDrop?
+
+Apple asks developers to pay for a yearly membership to have their apps "notarized", that is,
+checked by Apple before release. RetroDrop is a free hobby project and isn't notarized yet, so macOS
+can't vouch for it and shows a warning instead. It doesn't mean anything was found wrong with the app.
+
+If you'd like to check for yourself, RetroDrop's complete source code is in this repository, and
+you can [build it yourself](#build-from-source). Notarization is planned for a future release.
 
 ## Quick start
 
