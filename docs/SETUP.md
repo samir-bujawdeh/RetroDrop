@@ -16,8 +16,9 @@ kinds of old iPhone. If you get stuck, jump to [Troubleshooting](#troubleshootin
 
 ## 1. Install RetroDrop on your Mac
 
-1. **[Download RetroDrop](https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.zip)**. You always get the latest version.
-2. Double-click the zip, then drag **RetroDrop** into **Applications**.
+1. **[Download RetroDrop](https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg)**. You always get the latest version.
+2. Open the downloaded **RetroDrop.dmg**. In the window that appears, drag **RetroDrop** onto the
+   **Applications** folder, then eject the RetroDrop disk (in Finder's sidebar or on the desktop).
 3. Double-click RetroDrop to open it.
 
 **"RetroDrop Not Opened" / "Apple could not verify…"**

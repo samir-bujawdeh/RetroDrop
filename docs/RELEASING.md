@@ -19,14 +19,23 @@ All tests should pass. Then quit that copy and try a real phone if you can.
 
 ## 3. Build and publish
 
-`scripts/build.sh` creates `dist/RetroDrop-<version>.zip` and a version-free copy, `dist/RetroDrop.zip`.
-Create a GitHub release tagged `v<version>`, paste the changelog entry, and attach **both** zips.
-The README's download button links to `releases/latest/download/RetroDrop.zip`, so it only keeps
-working if every release includes `RetroDrop.zip`.
+`scripts/build.sh` creates, in `dist/`:
+
+- `RetroDrop-<version>.dmg`: the disk image with the drag-to-Applications window
+- `RetroDrop.dmg`: the same file under a version-free name
+- `RetroDrop-<version>.zip`: the plain app, for people who prefer a zip
+
+Create a GitHub release tagged `v<version>`, paste the changelog entry, and attach all three.
+The README's download button links to `releases/latest/download/RetroDrop.dmg`, so it only keeps
+working if **every release includes `RetroDrop.dmg`**.
+
+The disk image needs dmgbuild (`python3 -m venv .venv && .venv/bin/pip install dmgbuild`).
+To change the window's look, edit `scripts/make-dmg-background.swift` and run it. Icon positions
+live in `scripts/dmg-settings.py`.
 
 ```bash
 git tag v$(cat VERSION) && git push --tags
-gh release create v$(cat VERSION) dist/RetroDrop-$(cat VERSION).zip dist/RetroDrop.zip --notes-file <(sed -n '/^## /,$p' CHANGELOG.md | awk 'NR>1 && /^## /{exit} 1')
+gh release create v$(cat VERSION) dist/RetroDrop-$(cat VERSION).dmg dist/RetroDrop.dmg dist/RetroDrop-$(cat VERSION).zip --notes-file <(sed -n '/^## /,$p' CHANGELOG.md | awk 'NR>1 && /^## /{exit} 1')
 ```
 
 ## Optional: sign and notarize
@@ -45,7 +54,13 @@ SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" scripts/build.sh
 # Notarize and staple
 xcrun notarytool submit dist/RetroDrop-$(cat VERSION).zip --keychain-profile retrodrop --wait
 xcrun stapler staple build/RetroDrop.app
-ditto -c -k --keepParent build/RetroDrop.app dist/RetroDrop-$(cat VERSION).zip   # re-zip the stapled app
+ditto -c -k --norsrc --noextattr --keepParent build/RetroDrop.app dist/RetroDrop-$(cat VERSION).zip   # re-zip the stapled app
+# Rebuild the disk image from the stapled app, then notarize and staple it too:
+.venv/bin/dmgbuild -s scripts/dmg-settings.py -D app=build/RetroDrop.app RetroDrop dist/RetroDrop-$(cat VERSION).dmg
+codesign --force --timestamp --sign "$SIGN_IDENTITY" dist/RetroDrop-$(cat VERSION).dmg
+xcrun notarytool submit dist/RetroDrop-$(cat VERSION).dmg --keychain-profile retrodrop --wait
+xcrun stapler staple dist/RetroDrop-$(cat VERSION).dmg
+cp dist/RetroDrop-$(cat VERSION).dmg dist/RetroDrop.dmg
 ```
 
 If you do this, update the Install section of the README. The Open Anyway step is no longer needed.

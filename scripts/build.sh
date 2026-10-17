@@ -42,10 +42,24 @@ ZIP="dist/RetroDrop-$VERSION.zip"
 rm -f "$ZIP"
 ditto -c -k --norsrc --noextattr --keepParent "$APP" "$ZIP"  # no stray ._ metadata files
 
-# Same file under a version-free name, so the README's
-# releases/latest/download/RetroDrop.zip link always serves the newest release.
-cp "$ZIP" dist/RetroDrop.zip
+# Disk image with a drag-to-Applications window (what the README's download button serves).
+# Needs dmgbuild:  python3 -m venv .venv && .venv/bin/pip install dmgbuild
+# The window background comes from: swift scripts/make-dmg-background.swift
+DMG="dist/RetroDrop-$VERSION.dmg"
+if [[ -x .venv/bin/dmgbuild ]]; then
+  rm -f "$DMG"
+  .venv/bin/dmgbuild -s scripts/dmg-settings.py -D app="$APP" "RetroDrop" "$DMG" >/dev/null
+  if [[ -n "${SIGN_IDENTITY:-}" ]]; then
+    codesign --force --timestamp --sign "$SIGN_IDENTITY" "$DMG"
+  fi
+  # Same file under a version-free name, so the README's
+  # releases/latest/download/RetroDrop.dmg link always serves the newest release.
+  cp "$DMG" dist/RetroDrop.dmg
+  echo "==> Packaged $DMG and dist/RetroDrop.dmg"
+else
+  echo "!!  Skipped the .dmg: dmgbuild not found (see the comment in scripts/build.sh)"
+fi
 
 echo "==> Built $APP"
-echo "==> Packaged $ZIP and dist/RetroDrop.zip"
+echo "==> Packaged $ZIP"
 lipo -archs "$APP/Contents/MacOS/RetroDrop"

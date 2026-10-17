@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.zip"><img src="assets/download-button.svg" width="260" alt="Download RetroDrop for Mac"></a>
+  <a href="https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg"><img src="assets/download-button.svg" width="260" alt="Download RetroDrop for Mac"></a>
   <br>
   <sub><a href="#install">Install steps</a> · <a href="docs/SETUP.md">Setup guide</a> · <a href="https://github.com/samir-bujawdeh/RetroDrop/releases">All releases</a></sub>
 </p>
@@ -71,8 +71,8 @@ If you try another model, please open an issue and tell us how it went!
 
 ## Install
 
-1. **[Download RetroDrop](https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.zip)** and double-click the zip to unzip it.
-2. Drag **RetroDrop** into your **Applications** folder.
+1. **[Download RetroDrop](https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg)** and open the downloaded `RetroDrop.dmg`.
+2. In the window that appears, drag **RetroDrop** onto **Applications**. Then eject the RetroDrop disk.
 3. Open it. Because RetroDrop is a free app that isn't registered with Apple, macOS will block the
    first launch. To allow it:
    - Click **Done** on the warning.
@@ -119,7 +119,9 @@ scripts/build.sh
 open build/RetroDrop.app
 ```
 
-`scripts/build.sh` produces a universal `build/RetroDrop.app` and a release zip in `dist/`.
+`scripts/build.sh` produces a universal `build/RetroDrop.app`, plus the disk image and a zip in `dist/`.
+The disk image needs [dmgbuild](https://github.com/dmgbuild/dmgbuild):
+`python3 -m venv .venv && .venv/bin/pip install dmgbuild`. Without it, the script builds just the app and zip.
 The icons are drawn in code; regenerate them with `swift scripts/make-icons.swift`.
 
 To run the end-to-end tests, start the app with a scratch folder and run the test script:
