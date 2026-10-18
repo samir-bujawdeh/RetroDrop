@@ -7,7 +7,8 @@ enum MediaKind: String, Codable {
 }
 
 /// Turns modern Mac photos and videos into files that old iPhones can open:
-/// - photos: sRGB JPEG, at most 2048 px on the long side (HEIC, PNG, RAW... all work as input)
+/// - photos: sRGB JPEG under 2 megapixels (HEIC, PNG, RAW... all work as input). Old Mobile Safari
+///   decodes larger JPEGs at a fraction of their resolution to save memory, which looks terrible.
 /// - videos: H.264 Baseline 3.0 + AAC in .mp4, at most 640x480 at 30 fps, which is what the iPhone 3GS
 ///   can play (later models play it too)
 enum MediaConverter {
@@ -23,7 +24,8 @@ enum MediaConverter {
         }
     }
 
-    static let maxPhotoPixels = 2048
+    /// Mobile Safari on old iOS subsamples JPEGs over 2 megapixels, so stay just under.
+    static let maxPhotoArea = 1_990_000
     static let thumbPixels = 240
     static let maxVideoLongSide: CGFloat = 640
     static let maxVideoShortSide: CGFloat = 480
@@ -40,8 +42,31 @@ enum MediaConverter {
     // MARK: Photos
 
     static func convertPhoto(_ src: URL, to dst: URL) throws {
-        guard let image = downscaledImage(src, maxPixels: maxPhotoPixels) else { throw ConvertError.unreadable }
-        try writeJPEG(image, to: dst, quality: 0.85)
+        guard let size = pixelSize(of: src) else { throw ConvertError.unreadable }
+        // Largest long side that keeps the area under the limit, never upscaling.
+        let longSide = max(size.width, size.height), shortSide = min(size.width, size.height)
+        var maxSide = Int(min(longSide, (Double(maxPhotoArea) * longSide / shortSide).squareRoot()))
+        var image: CGImage?
+        repeat {  // rounding can land a few pixels over; step down until it fits
+            image = downscaledImage(src, maxPixels: maxSide)
+            maxSide -= 4
+        } while (image.map { $0.width * $0.height > maxPhotoArea } ?? false) && maxSide > 0
+        guard let image else { throw ConvertError.unreadable }
+        try writeJPEG(image, to: dst, quality: 0.9)
+    }
+
+    /// True if a JPEG is too big for old Mobile Safari to show sharply (used to fix up older outboxes).
+    static func exceedsPhotoLimit(_ url: URL) -> Bool {
+        guard let size = pixelSize(of: url) else { return false }
+        return size.width * size.height > Double(maxPhotoArea)
+    }
+
+    private static func pixelSize(of url: URL) -> (width: Double, height: Double)? {
+        guard let src = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let props = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as? [CFString: Any],
+              let w = props[kCGImagePropertyPixelWidth] as? Double, let h = props[kCGImagePropertyPixelHeight] as? Double,
+              w > 0, h > 0 else { return nil }
+        return (w, h)
     }
 
     /// Small JPEG preview for the phone's Safari page.

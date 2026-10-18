@@ -61,6 +61,13 @@ notes = os.path.join(media, "notes.txt")
 open(notes, "w").write("not a photo")
 check("test media created", all(os.path.getsize(f) > 0 for f in (heic, png, hevc, portrait)))
 
+# An item left over from an earlier version: a 2048x1536 (3.1 MP) photo, too big for old Safari.
+old = {"id": "oldbig01", "name": "Old Big.jpg", "kind": "photo", "added": 0}
+sh(f"sips -s format jpeg -z 1536 2048 assets/icon.png --out '{os.path.join(outbox_dir, 'oldbig01.jpg')}'")
+shutil.copy(os.path.join(outbox_dir, "oldbig01.jpg"), os.path.join(outbox_dir, "oldbig01-thumb.jpg"))
+open(os.path.join(outbox_dir, "oldbig01.eml"), "w").write("placeholder")
+json.dump([old], open(os.path.join(outbox_dir, "outbox.json"), "w"))
+
 # --- Launch with the files queued ---
 sh(f"pkill -f '{EXE}'")
 subprocess.run(["open", "-n", APP, "--args", "-outboxDir", outbox_dir, "-saveFolder", photos_dir, "--start",
@@ -73,9 +80,18 @@ for _ in range(120):
         items = json.load(open(manifest))
     except Exception:
         continue
-    if len(items) >= 4:
+    if len(items) >= 5:
         break
-check("4 media files queued, text file skipped", len(items) == 4, f"{len(items)} items")
+time.sleep(1)  # let the old-photo fix-up finish
+items = json.load(open(manifest))
+check("4 media files queued, text file skipped", len(items) == 5, f"{len(items) - 1} new items")
+oldjpg = os.path.join(outbox_dir, "oldbig01.jpg")
+od = sh(f"sips -g pixelWidth -g pixelHeight '{oldjpg}'")
+ow = int(od.split("pixelWidth: ")[1].split()[0]); oh = int(od.split("pixelHeight: ")[1].split()[0])
+check("photo queued by an older version shrunk under 2 MP", ow * oh <= 1_990_000, f"{ow}x{oh}")
+oldmsg = email.message_from_bytes(open(os.path.join(outbox_dir, "oldbig01.eml"), "rb").read())
+check("...and its email rebuilt with the smaller photo",
+      any(p.get_payload(decode=True) == open(oldjpg, "rb").read() for p in oldmsg.walk() if p.get_filename()))
 by_name = {i["name"]: i for i in items}
 path = lambda item, which: os.path.join(outbox_dir, f"{item['id']}{which}")
 
@@ -86,7 +102,10 @@ try:
         out = path(p, ".jpg")
         dims = sh(f"sips -g pixelWidth -g pixelHeight -g format -g profile '{out}'")
         check("HEIC -> JPEG", "format: jpeg" in dims)
-        check("rotated upright and scaled to 2048 long side", "pixelWidth: 1536" in dims and "pixelHeight: 2048" in dims, dims.split("\n")[1:3])
+        w = int(dims.split("pixelWidth: ")[1].split()[0]); h = int(dims.split("pixelHeight: ")[1].split()[0])
+        check("rotated upright (portrait)", h > w, f"{w}x{h}")
+        check("under 2 megapixels (old Safari's limit) but not much smaller", 1_900_000 < w * h <= 1_990_000, f"{w * h:,} px")
+        check("aspect ratio kept", abs(h / w - 4 / 3) < 0.01)
         check("colour converted to sRGB", "sRGB" in dims, dims.split("\n")[-1].strip())
     else:
         check("HEIC photo queued", False)

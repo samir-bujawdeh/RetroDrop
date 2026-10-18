@@ -33,6 +33,25 @@ final class Outbox {
            let saved = try? JSONDecoder().decode([OutboxItem].self, from: data) {
             items = saved.filter { FileManager.default.fileExists(atPath: dir.appendingPathComponent($0.file).path) }
         }
+        queue.async { [self] in shrinkOversizedPhotos() }
+    }
+
+    /// Photos queued by an earlier version could be over 2 megapixels, which old Safari shows badly.
+    /// Shrink them in place and rebuild their emails.
+    private func shrinkOversizedPhotos() {
+        for item in snapshot() where item.kind == .photo {
+            let url = dir.appendingPathComponent(item.file)
+            guard MediaConverter.exceedsPhotoLimit(url) else { continue }
+            let tmp = dir.appendingPathComponent("\(item.id)-resized.jpg")
+            do {
+                try MediaConverter.convertPhoto(url, to: tmp)
+                _ = try FileManager.default.replaceItemAt(url, withItemAt: tmp)
+                try Self.emailMessage(for: item, file: url).write(to: dir.appendingPathComponent(item.message))
+            } catch {
+                try? FileManager.default.removeItem(at: tmp)
+            }
+        }
+        notify()
     }
 
     private var manifestURL: URL { dir.appendingPathComponent("outbox.json") }
