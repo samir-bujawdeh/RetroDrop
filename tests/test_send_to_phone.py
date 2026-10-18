@@ -140,7 +140,12 @@ try:
     base = "http://127.0.0.1:8765"
     page = urllib.request.urlopen(base + "/", timeout=5).read().decode()
     check("page shows From your Mac with all items", "From your Mac" in page and all(i["id"] in page for i in items))
+    check("no saveable thumbnail <img> on the main page", "-thumb.jpg\"" not in page.split("From your Mac")[1].split("<p>Tap a video")[0]
+          and "<img src=\"/out/" not in page.split("From your Mac")[1].split("<p>Tap a video")[0])
     photo = by_name["Sideways Photo.jpg"]
+    view = urllib.request.urlopen(f"{base}/view/{photo['id']}", timeout=5).read().decode()
+    check("photo page shows the full-size photo", f'<img src="/out/{photo["id"]}.jpg"' in view and "Save Image" in view)
+    check("photo page has Previous/Next between photos", "Previous" in view or "Next" in view)
     body = urllib.request.urlopen(f"{base}/out/{photo['id']}.jpg", timeout=5).read()
     check("full photo download identical", body == open(path(photo, ".jpg"), "rb").read())
     vid = path(v1, ".mp4")
@@ -156,6 +161,7 @@ try:
         except urllib.error.HTTPError as e:
             return e.code
     check("out-of-range request -> 416", status(f"{base}/out/{v1['id']}.mp4", {"Range": "bytes=999999999-"}) == 416)
+    check("unknown photo page -> 404", status(f"{base}/view/nope") == 404)
     check("can't fetch the manifest or other files", status(f"{base}/out/outbox.json") == 404 and status(f"{base}/out/..%2F..%2Fetc%2Fpasswd") == 404)
 
     # --- Mail (POP3) ---

@@ -83,6 +83,13 @@ enum WebUpload {
             let type = name.hasSuffix(".mp4") ? "video/mp4" : "image/jpeg"
             return serveFile(conn, url: url, contentType: type, range: headers["range"], headOnly: method == "HEAD")
         }
+        if path.hasPrefix("/view/") {
+            let id = String(path.dropFirst("/view/".count))
+            guard let page = photoPage(id: id, outbox: outbox.snapshot()) else {
+                return respond(conn, status: "404 Not Found", body: "")
+            }
+            return respond(conn, status: "200 OK", body: page)
+        }
         if path != "/" {
             return respond(conn, status: "404 Not Found", body: "")
         }
@@ -164,6 +171,26 @@ enum WebUpload {
         return String(format: " %d:%02d", s / 60, s % 60)
     }
 
+    /// One full-size photo (under 2 MP, so old Safari shows it sharply), ready to touch and hold and save.
+    private static func photoPage(id: String, outbox: [OutboxItem]) -> String? {
+        let photos = Array(outbox.filter { $0.kind == .photo }.reversed())  // same order as the main page
+        guard let i = photos.firstIndex(where: { $0.id == id }) else { return nil }
+        let item = photos[i]
+        let prev = i > 0 ? "<a href=\"/view/\(photos[i - 1].id)\">&larr; Previous</a>" : ""
+        let next = i < photos.count - 1 ? "<a href=\"/view/\(photos[i + 1].id)\">Next &rarr;</a>" : ""
+        return """
+        <html><head><meta name="viewport" content="width=device-width">
+        <title>\(escape(item.name))</title></head>
+        <body style="font-family:Helvetica;margin:0;background:#fff;color:#222">
+        <p style="margin:12px 16px"><a href="/">&larr; RetroDrop</a>
+        <span style="float:right;color:#888">\(i + 1) of \(photos.count)</span></p>
+        <p style="margin:0 16px 12px"><b>Touch and hold the photo</b>, then tap <b>Save Image</b>.</p>
+        <img src="/out/\(item.file)" alt="\(escape(item.name))" style="width:100%;display:block">
+        <p style="margin:14px 16px;font-size:18px">\(prev)<span style="float:right">\(next)</span></p>
+        </body></html>
+        """
+    }
+
     /// Plain HTML that old Mobile Safari renders fine; no HTTPS, no modern JS or CSS.
     private static func page(message: String, outbox: [OutboxItem]) -> String {
         var fromMac = ""
@@ -172,10 +199,15 @@ enum WebUpload {
             let videos = outbox.filter { $0.kind == .video }
             fromMac += "<h3 style=\"margin-top:28px\">From your Mac</h3>"
             if !photos.isEmpty {
-                fromMac += "<p>Tap a photo to open it, then <b>touch and hold</b> it and tap <b>Save Image</b>.</p><p>"
+                fromMac += "<p>Tap a photo to open it full size, then <b>touch and hold</b> it and tap "
+                    + "<b>Save Image</b>.</p><p>"
+                // Thumbnails are link backgrounds, not <img>s: touching and holding one offers Open/Copy,
+                // never "Save Image", so nobody saves the small preview by mistake.
                 for item in photos.reversed() {
-                    fromMac += "<a href=\"/out/\(item.file)\"><img src=\"/out/\(item.thumb)\" height=\"96\" "
-                        + "alt=\"\(escape(item.name))\" style=\"margin:0 6px 6px 0;border-radius:6px\"></a>"
+                    fromMac += "<a href=\"/view/\(item.id)\" title=\"\(escape(item.name))\" style=\"display:inline-block;"
+                        + "width:96px;height:96px;margin:0 6px 6px 0;border-radius:6px;background:#ddd "
+                        + "url(/out/\(item.thumb)) center no-repeat;-webkit-background-size:cover;background-size:cover\">"
+                        + "</a>"
                 }
                 fromMac += "</p>"
             }
