@@ -167,7 +167,7 @@ RetroDrop also works the other way round: from your Mac to the phone.
 1. In the RetroDrop menu, choose **Send Photos & Videos to Phone…**, or drop files onto the RetroDrop
    menu bar icon. You can also right-click a file in Finder and choose **Open With → RetroDrop**.
 2. RetroDrop converts them so old iPhones can open them: photos become JPEGs (up to 2048 pixels),
-   and videos become 640×480 H.264, which plays even on an iPhone 3GS. **Waiting on Phone** in the menu
+   and videos become 640×480 H.264, which plays on any old iPhone. **Waiting on Phone** in the menu
    lists what's ready.
 3. On the phone, with RetroDrop's server running:
    - **Safari** (any iOS version): open RetroDrop's address. Under **From your Mac**, tap a photo,

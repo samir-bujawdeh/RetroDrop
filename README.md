@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Get photos and videos off old iPhones, over Wi‑Fi, straight into your Mac.</b><br>
-  A free menu bar app for people who still shoot with an iPhone 3GS, iPhone 4 and friends.
+  A free menu bar app for people who still shoot with old iPhones.
 </p>
 
 <p align="center">
@@ -58,13 +58,14 @@ ready to drag onto your desktop or into any app.
 
 | Phone software | How to send | Notes |
 |---|---|---|
-| iOS 6 – iOS 10 (e.g. iPhone 3GS, 4, 4S, 5, 5c) | **Safari** web page | Photos & videos, several at once |
-| iOS 5 (e.g. iPhone 3GS, 4 that were never updated) | **Mail** | Safari can't upload files before iOS 6 |
-| iPhone OS 3 – iOS 4 (iPhone 2G, 3G, 3GS) | **Mail** | Should work the same way; not yet tested, reports welcome |
+| iOS 6 – iOS 10 | **Safari** web page | Photos & videos, several at once |
+| iOS 5 | **Mail** | Safari can't upload files before iOS 6 |
+| iOS 3 – iOS 4 | **Mail** | Should work the same way; not yet tested, reports welcome |
 
 Newer phones work with the Safari route too, but they have better options like AirDrop.
 
-**Tested so far:** iPhone 3GS on iOS 6 (Safari), iPhone 4 on iOS 5 (Mail).
+**Tested so far:** iOS 6 (Safari) and iOS 5 (Mail).
+Not sure which iOS your iPhone runs? Open **Settings → General → About** and look at **Version**.
 If you try another model, please open an issue and tell us how it went!
 
 ## Requirements
