@@ -64,3 +64,15 @@ cp dist/RetroDrop-$(cat VERSION).dmg dist/RetroDrop.dmg
 ```
 
 If you do this, update the Install section of the README. The Open Anyway step is no longer needed.
+
+## Website
+
+The website lives in `website/` (plain HTML and CSS, no build step) and is served by GitHub Pages
+from the `gh-pages` branch. After committing changes to `website/`, publish with:
+
+```bash
+scripts/publish-site.sh
+```
+
+The download buttons link to `releases/latest/download/RetroDrop.dmg`, so the site needs no changes
+for new releases.

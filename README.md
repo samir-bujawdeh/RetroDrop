@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg"><img src="assets/download-button.svg" width="260" alt="Download RetroDrop for Mac"></a>
   <br>
-  <sub><a href="#install">Install steps</a> · <a href="docs/SETUP.md">Setup guide</a> · <a href="https://github.com/samir-bujawdeh/RetroDrop/releases">All releases</a></sub>
+  <sub><a href="https://samir-bujawdeh.github.io/RetroDrop/">Website</a> · <a href="#install">Install steps</a> · <a href="docs/SETUP.md">Setup guide</a> · <a href="https://github.com/samir-bujawdeh/RetroDrop/releases">All releases</a></sub>
 </p>
 
 ---
