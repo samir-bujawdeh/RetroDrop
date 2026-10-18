@@ -56,7 +56,7 @@ A small phone icon appears in your menu bar. That's RetroDrop. There's no window
 
 ## 2. Start the server
 
-Click the phone icon and choose **Start Server**. The icon fills in, and the menu shows:
+Click the phone icon and choose **Start Server**. The icon changes to show a signal, and the menu shows:
 
 - **iOS 6 and later · open in Safari**: an address like `http://192.168.1.23:8765`
 - **iOS 5 and earlier · mail server**: your Mac's address, like `192.168.1.23`
@@ -173,7 +173,7 @@ in the phone's account, so it's worth making the address permanent:
 ## Troubleshooting
 
 **The phone can't open the page / "Safari can't open the page"**
-- Is the server running? The menu bar icon should be filled in.
+- Is the server running? The menu bar icon should show a signal.
 - Are the phone and the Mac on the same Wi‑Fi? Guest networks often block devices from seeing each other.
 - Check the address in the RetroDrop menu. It may have changed. Include `http://` and `:8765`.
 - macOS firewall: open **System Settings → Network → Firewall → Options…** and make sure RetroDrop is set
