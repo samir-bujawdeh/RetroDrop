@@ -39,160 +39,7 @@
 <meta property="og:url" content="https://samir-bujawdeh.github.io/RetroDrop/">
 <meta name="twitter:card" content="summary_large_image">
 
-<style>
-:root {
-  --bg: #FBF3E6;
-  --bg-2: #F4E6D2;
-  --surface: #FFFAF2;
-  --ink: #2B1C3A;
-  --ink-2: #5E4560;
-  --line: #E8D6BE;
-  --plum: #6B2D5C;
-  --orange: #E0703A;
-  --sun: #F6C445;
-  --red: #D9483B;
-  --amber: #EE8A3A;
-  --link: #B54A22;
-  --shadow: 0 24px 60px -24px rgba(64, 26, 54, .45);
-  --radius: 18px;
-  --max: 1080px;
-  color-scheme: light dark;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1B1424;
-    --bg-2: #22192D;
-    --surface: #2A2035;
-    --ink: #F6EBDD;
-    --ink-2: #C9B6C2;
-    --line: #3D3048;
-    --link: #F4A36B;
-    --shadow: 0 24px 60px -24px rgba(0, 0, 0, .8);
-  }
-}
-
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-img { max-width: 100%; height: auto; display: block; }
-a { color: var(--link); }
-h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 .5em; }
-h2 { font-size: clamp(28px, 4vw, 38px); }
-h3 { font-size: 20px; }
-p { margin: 0 0 1em; }
-.wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
-section { padding: 72px 0; }
-.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--orange); }
-.muted { color: var(--ink-2); }
-
-/* Retro stripes, used as dividers */
-.stripes { height: 40px; background: linear-gradient(to bottom,
-  var(--sun) 0 25%, var(--amber) 25% 50%, var(--red) 50% 75%, var(--plum) 75% 100%); }
-.stripes.thin { height: 16px; }
-
-/* Header */
-header.top { position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px); background: color-mix(in srgb, var(--bg) 82%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
-header.top .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; color: var(--ink); text-decoration: none; }
-.brand img { width: 30px; height: 30px; }
-nav { margin-left: auto; display: flex; gap: 22px; font-size: 15px; }
-nav a { color: var(--ink-2); text-decoration: none; }
-nav a:hover { color: var(--ink); }
-@media (max-width: 640px) { nav a:not(.gh) { display: none; } }
-
-/* Hero */
-.hero { position: relative; overflow: hidden; padding: 64px 0 0; }
-.hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
-.hero h1 { font-size: clamp(40px, 6.4vw, 66px); font-weight: 800; }
-.hero h1 .accent { background: linear-gradient(90deg, var(--plum), var(--red) 55%, var(--amber));
-  -webkit-background-clip: text; background-clip: text; color: transparent; }
-@media (prefers-color-scheme: dark) {
-  .hero h1 .accent { background: linear-gradient(90deg, #F08A8A, var(--amber) 55%, var(--sun));
-    -webkit-background-clip: text; background-clip: text; }
-}
-.hero .lede { font-size: 20px; color: var(--ink-2); max-width: 34em; }
-.cta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 28px 0 10px; }
-.btn { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 700;
-  border-radius: 14px; padding: 14px 22px; font-size: 17px; transition: transform .15s ease, box-shadow .15s ease; }
-.btn:hover { transform: translateY(-2px); }
-.btn-primary { color: #FFF4E0; background: linear-gradient(135deg, var(--plum), var(--red) 55%, #F4A340);
-  box-shadow: 0 12px 30px -10px rgba(217, 72, 59, .6); }
-.btn-primary small { display: block; font-weight: 500; font-size: 12.5px; opacity: .85; }
-.btn-primary svg { flex: none; }
-.btn-ghost { color: var(--ink); border: 1.5px solid var(--line); background: var(--surface); }
-.fineprint { font-size: 14px; color: var(--ink-2); }
-.hero-art { position: relative; display: flex; justify-content: center; padding-bottom: 40px; }
-.hero-art::before { content: ""; position: absolute; width: 360px; height: 360px; border-radius: 50%;
-  top: 20px; left: 50%; transform: translateX(-50%);
-  background: radial-gradient(circle at 50% 40%, #FFD27A, #F7894A 70%); opacity: .9; }
-.hero-art img { position: relative; width: 300px; border-radius: 14px; box-shadow: var(--shadow); }
-@media (max-width: 860px) {
-  .hero .wrap { grid-template-columns: 1fr; }
-  .hero-art::before { width: 300px; height: 300px; }
-}
-
-/* Phones strip */
-.phones { padding: 26px 0; background: var(--bg-2); border-block: 1px solid var(--line); }
-.phones .wrap { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: center; }
-.chip { font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--surface);
-  border: 1px solid var(--line); color: var(--ink-2); }
-
-/* Cards */
-.grid { display: grid; gap: 22px; }
-.grid.two { grid-template-columns: repeat(2, 1fr); }
-.grid.three { grid-template-columns: repeat(3, 1fr); }
-@media (max-width: 860px) { .grid.two, .grid.three { grid-template-columns: 1fr; } }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
-.card .tag { display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: .04em;
-  padding: 4px 10px; border-radius: 999px; color: #FFF4E0; background: var(--orange); margin-bottom: 12px; }
-.card .tag.mail { background: var(--plum); }
-.card ol { margin: 0; padding-left: 20px; }
-.card li { margin: 6px 0; }
-.feature h3 { display: flex; align-items: center; gap: 10px; }
-.feature .ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex: none;
-  background: color-mix(in srgb, var(--orange) 16%, transparent); color: var(--orange); }
-
-/* Table */
-.table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius); overflow: hidden; font-size: 16px; }
-.table th, .table td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.table tr:last-child td { border-bottom: 0; }
-.table th { background: var(--bg-2); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); }
-.scroll-x { overflow-x: auto; }
-
-/* Install steps */
-.steps { counter-reset: step; display: grid; gap: 36px; }
-.step { display: grid; grid-template-columns: 1fr 1.1fr; gap: 32px; align-items: center; }
-.step h3::before { counter-increment: step; content: counter(step); display: inline-grid; place-items: center;
-  width: 30px; height: 30px; margin-right: 10px; border-radius: 50%; background: var(--orange); color: #FFF4E0;
-  font-size: 15px; vertical-align: 2px; }
-.step img { max-height: 420px; width: auto; margin: 0 auto;
-  filter: drop-shadow(0 16px 24px rgba(64, 26, 54, .28)); } /* follows the image's shape, not its transparent margin */
-.step.wide { grid-template-columns: 1fr; gap: 16px; }
-.step.wide img { max-height: none; width: 100%; }
-@media (max-width: 860px) { .step { grid-template-columns: 1fr; } }
-.why { margin-top: 40px; }
-
-/* FAQ */
-details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; margin: 12px 0; }
-summary { cursor: pointer; font-weight: 700; }
-details p { margin: 12px 0 0; color: var(--ink-2); }
-
-/* Final CTA + footer */
-.final { text-align: center; }
-.final .cta { justify-content: center; }
-footer { padding: 28px 0 40px; font-size: 14px; color: var(--ink-2); }
-footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; }
-code { font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg-2); padding: 2px 6px; border-radius: 6px; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -203,7 +50,8 @@ code { font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace; background: 
       <a href="#how">How it works</a>
       <a href="#phones">Phones</a>
       <a href="#install">Install</a>
-      <a href="#faq">FAQ</a>
+      <a href="old-iphone-photos-to-mac/">Guide</a>
+      <a href="setup/">Setup</a>
       <a class="gh" href="https://github.com/samir-bujawdeh/RetroDrop">GitHub</a>
     </nav>
   </div>
@@ -247,7 +95,8 @@ code { font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace; background: 
     <div class="eyebrow">How it works</div>
     <h2>Two ways in, depending on your phone</h2>
     <p class="muted" style="max-width:40em">Old iPhones can't use AirDrop, iCloud or modern websites. RetroDrop turns your Mac
-      into a tiny server on your home Wi‑Fi that they <em>can</em> talk to. Everything stays on your network.</p>
+      into a tiny server on your home Wi‑Fi that they <em>can</em> talk to. Everything stays on your network.
+      (Curious about the alternatives? <a href="old-iphone-photos-to-mac/">Here's every method compared.</a>)</p>
     <div class="grid two" style="margin-top:28px">
       <div class="card">
         <span class="tag">iOS 6 and later</span>
@@ -348,7 +197,7 @@ code { font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace; background: 
         notarization is planned for a future release.</p>
     </div>
     <p class="muted" style="margin-top:24px">Full walkthrough, including the one-time Mail setup for iOS 5 phones:
-      <a href="https://github.com/samir-bujawdeh/RetroDrop/blob/main/docs/SETUP.md">setup guide</a>.</p>
+      <a href="setup/">setup guide</a>.</p>
   </div>
 </section>
 
@@ -373,7 +222,8 @@ code { font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace; background: 
         your home network only.</p></details>
     <details><summary>Can't I just use a cable?</summary>
       <p>You can! Image Capture over USB still works. RetroDrop is for when you'd rather not dig out a 30‑pin cable, and
-        only want the photos you pick to show up, ready to drag anywhere.</p></details>
+        only want the photos you pick to show up, ready to drag anywhere. See
+        <a href="old-iphone-photos-to-mac/">every way to get photos off an old iPhone, compared</a>.</p></details>
     <details><summary>My phone isn't listed. Will it work?</summary>
       <p>If it runs iOS 6 or later, use Safari. If it's older, use Mail. Please
         <a href="https://github.com/samir-bujawdeh/RetroDrop/issues">open an issue</a> and tell us how it went, so we can
@@ -398,7 +248,8 @@ code { font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace; background: 
 <div class="stripes thin"></div>
 <footer>
   <div class="wrap">
-    <span>RetroDrop · Free and open source (MIT) · <a href="https://github.com/samir-bujawdeh/RetroDrop">GitHub</a></span>
+    <span>RetroDrop · Free and open source (MIT) · <a href="setup/">Setup guide</a> ·
+      <a href="old-iphone-photos-to-mac/">Old iPhone photos guide</a> · <a href="https://github.com/samir-bujawdeh/RetroDrop">GitHub</a></span>
     <span>Not affiliated with Apple Inc. iPhone, Mac and Safari are trademarks of Apple Inc.</span>
   </div>
 </footer>

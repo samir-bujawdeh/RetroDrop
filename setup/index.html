@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RetroDrop setup guide – send photos from iPhone 3GS / 4 (iOS 5 &amp; 6) to your Mac</title>
+<meta name="description" content="Step-by-step: install RetroDrop on your Mac, then send photos from an old iPhone with Safari (iOS 6+) or the Mail app (iOS 5 and earlier). Includes the one-time Mail setup and troubleshooting.">
+<link rel="canonical" href="https://samir-bujawdeh.github.io/RetroDrop/setup/">
+<link rel="icon" type="image/png" href="../img/favicon-64.png">
+<link rel="apple-touch-icon" href="../img/favicon.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RetroDrop setup guide">
+<meta property="og:description" content="Send photos from an iPhone 3GS or 4 to your Mac over Wi‑Fi, with Safari (iOS 6+) or Mail (iOS 5 and earlier).">
+<meta property="og:image" content="https://samir-bujawdeh.github.io/RetroDrop/img/social-card.png">
+<meta property="og:url" content="https://samir-bujawdeh.github.io/RetroDrop/setup/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#FBF3E6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1424" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../"><img src="../img/favicon-64.png" alt="">RetroDrop</a>
+    <nav>
+      <a href="../#how">How it works</a>
+      <a href="../old-iphone-photos-to-mac/">Guide</a>
+      <a href="./">Setup</a>
+      <a class="gh" href="https://github.com/samir-bujawdeh/RetroDrop">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="article">
+  <div class="wrap">
+    <div class="crumbs"><a href="../">RetroDrop</a> › Setup guide</div>
+    <h1>RetroDrop setup guide</h1>
+    <p class="lede">Everything from installing RetroDrop to sending your first photo, for both kinds of old iPhone. Stuck?
+      Jump to <a href="#troubleshooting">Troubleshooting</a>.</p>
+
+    <div class="toc">
+      <b>Contents</b>
+      <ol>
+        <li><a href="#install">Install RetroDrop on your Mac</a></li>
+        <li><a href="#start">Start the server</a></li>
+        <li><a href="#route">Find out which route your phone uses</a></li>
+        <li><a href="#safari">Send with Safari (iOS 6 and later)</a></li>
+        <li><a href="#mail">Send with Mail (iOS 5 and earlier)</a></li>
+        <li><a href="#photos">Get your photos</a></li>
+        <li><a href="#address">Keep your Mac's address from changing</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+      </ol>
+    </div>
+
+    <h2 id="install">1. Install RetroDrop on your Mac</h2>
+    <ol>
+      <li><a href="https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg"><b>Download RetroDrop</b></a>.
+        It's free, and needs macOS 14 Sonoma or later.</li>
+      <li>Open the downloaded <b>RetroDrop.dmg</b>. Drag <b>RetroDrop</b> onto <b>Applications</b>, then eject the
+        RetroDrop disk.
+        <img src="../img/install/1-open-dmg.png" width="460" height="310" loading="lazy" alt="The RetroDrop disk image window: drag RetroDrop onto Applications"></li>
+      <li>Open RetroDrop from Applications.</li>
+    </ol>
+
+    <h3>"RetroDrop Not Opened": allowing it the first time</h3>
+    <p>macOS warns about RetroDrop because it's a free app that isn't notarized by Apple yet. Notarization requires a
+      paid Apple membership, and the warning doesn't mean anything was found wrong. You only do this once:</p>
+    <ol>
+      <li>On the warning, click <b>Done</b>, <em>not</em> Move to Trash.
+        <img src="../img/install/2-click-done.png" width="420" height="274" loading="lazy" alt="The “RetroDrop Not Opened” message, with Done highlighted"></li>
+      <li>Open <b>System Settings → Privacy &amp; Security</b>, scroll down to <b>Security</b>, and click
+        <b>Open Anyway</b> next to the RetroDrop message.
+        <img src="../img/install/3-open-anyway-settings-crop.png" width="700" height="159" loading="lazy" alt="Privacy &amp; Security settings, with the Open Anyway button highlighted"></li>
+      <li>In the confirmation, click <b>Open Anyway</b>, then enter your password or use Touch ID if asked.
+        <img src="../img/install/4-open-anyway-confirm.png" width="420" height="340" loading="lazy" alt="The “Open RetroDrop?” confirmation, with Open Anyway highlighted"></li>
+    </ol>
+    <details><summary>Prefer the Terminal?</summary>
+      <p>This removes the download flag so macOS stops asking: <code>xattr -dr com.apple.quarantine /Applications/RetroDrop.app</code></p></details>
+    <p>A small phone icon appears in your menu bar. That's RetroDrop. There's no window or Dock icon.
+      <b>Optional:</b> tick <b>Open at Login</b> in its menu so it's always there after a restart.</p>
+
+    <h2 id="start">2. Start the server</h2>
+    <p>Click the phone icon and choose <b>Start Server</b>. The icon changes to show a signal, and the menu shows:</p>
+    <ul>
+      <li><b>iOS 6 and later · open in Safari</b>: an address like <code>http://192.168.1.23:8765</code></li>
+      <li><b>iOS 5 and earlier · mail server</b>: your Mac's address, like <code>192.168.1.23</code></li>
+    </ul>
+    <p>Click either one to copy it. The first time, if macOS asks whether RetroDrop may <b>accept incoming network
+      connections</b>, click <b>Allow</b>. Without this, the phone can't reach your Mac.</p>
+    <div class="callout"><p>The phone and the Mac must be on the <b>same Wi‑Fi network</b>.</p></div>
+
+    <h2 id="route">3. Find out which route your phone uses</h2>
+    <p>On the phone, open <b>Settings → General → About</b> and look at <b>Version</b>.</p>
+    <ul>
+      <li><b>6.0 or higher:</b> use <a href="#safari">Safari</a>.</li>
+      <li><b>5.x or lower:</b> use <a href="#mail">Mail</a>. Safari on these versions can't upload files at all, which is
+        why the <i>Choose File</i> button is greyed out.</li>
+    </ul>
+
+    <h2 id="safari">4. Send with Safari (iOS 6 and later)</h2>
+    <ol>
+      <li>On the phone, open <b>Safari</b>.</li>
+      <li>Type the address from the RetroDrop menu, for example <code>http://192.168.1.23:8765</code>. Include the
+        <code>http://</code> and the <code>:8765</code>.</li>
+      <li>Tap <b>Choose File</b> and pick one or more photos or videos.</li>
+      <li>Tap <b>Upload</b>, and wait for the green <b>Saved</b> message. Videos can take a minute on an old phone's
+        Wi‑Fi, so keep the page open until it finishes.</li>
+    </ol>
+    <p><b>Tip:</b> bookmark the page or add it to your Home Screen, so next time it's one tap.</p>
+
+    <h2 id="mail">5. Send with Mail (iOS 5 and earlier)</h2>
+    <p>Here, the phone thinks it's sending an email. RetroDrop pretends to be the mail server and keeps the
+      attachments. Nothing is actually emailed, and nothing leaves your network.</p>
+    <h3>One-time setup (about 2 minutes)</h3>
+    <p>Keep RetroDrop's server running while you do this, because the phone checks the settings as you go.</p>
+    <ol>
+      <li>On the phone, open <b>Settings → Mail, Contacts, Calendars → Add Account… → Other → Add Mail Account</b>.</li>
+      <li>Fill in <b>Name:</b> <code>RetroDrop</code>, <b>Address:</b> <code>retrodrop@mac.local</code>,
+        <b>Password:</b> anything (e.g. <code>retro</code>), <b>Description:</b> <code>RetroDrop</code>.</li>
+      <li>Tap <b>Next</b>, then choose <b>POP</b> at the top.</li>
+      <li>Under <b>Incoming Mail Server</b>: <b>Host Name</b> is your Mac's address from the RetroDrop menu (e.g.
+        <code>192.168.1.23</code>), <b>User Name</b> is <code>retrodrop</code>, and <b>Password</b> is anything.</li>
+      <li>Under <b>Outgoing Mail Server</b>: <b>Host Name</b> is the same address. Leave <b>User Name</b> and
+        <b>Password</b> blank.</li>
+      <li>Tap <b>Save</b>. If the phone asks <i>"Cannot connect using SSL. Do you want to try setting up the account
+        without SSL?"</i>, tap <b>Yes</b>.</li>
+    </ol>
+    <h3>Sending photos and videos</h3>
+    <ol>
+      <li>Open <b>Photos</b> and pick a photo or video. To send several photos at once, open an album, tap the share
+        button, select up to 5 photos, then tap <b>Share</b>.</li>
+      <li>Choose <b>Email Photo</b> (or <b>Email Video</b>).</li>
+      <li>Make sure the <b>From</b> field shows <code>retrodrop@mac.local</code>. Tap it to change it.</li>
+      <li>Put any address in <b>To</b>, e.g. <code>mac@mac.local</code>. It's never used.</li>
+      <li>Tap <b>Send</b>. The photos appear on your Mac within a few seconds.</li>
+    </ol>
+    <div class="callout">
+      <p><b>Long videos:</b> Mail on old iOS may offer to send a smaller version, or refuse very long videos. Trim long
+        clips on the phone first.</p>
+      <p><b>"Cannot Get Mail" when RetroDrop is off?</b> That's harmless. To silence it, turn the account off under
+        Settings → Mail, Contacts, Calendars → RetroDrop, and back on when you need it.</p>
+    </div>
+
+    <h2 id="photos">6. Get your photos</h2>
+    <p>Everything is saved in <b>Pictures/RetroDrop</b> on your Mac. You can change the folder with <b>Change Folder…</b>
+      in the menu. From the RetroDrop menu:</p>
+    <ul>
+      <li><b>This session</b> shows what arrived since you last pressed Start. <b>All photos</b> shows everything in the
+        folder.</li>
+      <li><b>Drag</b> a thumbnail onto the desktop or into any app to copy it. <b>Double-click</b> to open it.</li>
+      <li>Click <b>Saving to "RetroDrop"</b> to open the folder in Finder.</li>
+    </ul>
+    <p>Files are named with the date and time they arrived, e.g. <code>20261018-143205-image.jpg</code>, so nothing is
+      ever overwritten. Choose <b>Stop Server</b> when you're done.</p>
+
+    <h2 id="address">7. Keep your Mac's address from changing</h2>
+    <p>Your router gives your Mac its address, and it can change after a restart. For the Safari route, just check the
+      RetroDrop menu each time. For the Mail route, a changed address means editing both Host Names on the phone, so it's
+      worth making the address permanent:</p>
+    <ul>
+      <li><b>Best:</b> in your router's settings, look for <b>DHCP reservation</b>, <b>static lease</b> or <b>address
+        reservation</b>, and reserve the current address for your Mac.</li>
+      <li><b>Alternative:</b> on the Mac, open <b>System Settings → Network → Wi‑Fi → Details… → TCP/IP</b>, set
+        <b>Configure IPv4</b> to <b>Using DHCP with manual address</b>, and enter the current address.</li>
+    </ul>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+    <h3>Safari says it can't open the page</h3>
+    <ul>
+      <li>Is the server running? The menu bar icon should show a signal.</li>
+      <li>Are the phone and the Mac on the same Wi‑Fi? Guest networks often block devices from seeing each other.</li>
+      <li>Check the address in the RetroDrop menu, which may have changed. Include <code>http://</code> and the port.</li>
+      <li>macOS firewall: open <b>System Settings → Network → Firewall → Options…</b> and make sure RetroDrop is allowed to
+        accept incoming connections.</li>
+      <li>Some routers have <b>client isolation</b> or <b>AP isolation</b> turned on, which stops devices on Wi‑Fi from
+        talking to each other. Turn it off in the router settings.</li>
+    </ul>
+    <h3>"Choose File" is greyed out in Safari</h3>
+    <p>The phone is on iOS 5 or earlier, where Safari can't upload files. Use the <a href="#mail">Mail route</a> instead.</p>
+    <h3>The menu says "Port 8765 was busy…"</h3>
+    <p>Another app on your Mac was using RetroDrop's usual port, so RetroDrop moved to the next free one. Use the new
+      address shown in the menu, and update any bookmarks on your phones.</p>
+    <h3>Mail setup can't connect, or says "Cannot Verify Server Identity"</h3>
+    <ul>
+      <li>Start the server on the Mac first. The phone checks the account during setup.</li>
+      <li>Make sure both Host Names are your Mac's current address, and that SSL is off. You'll find the SSL setting under
+        the account's <b>Advanced</b> settings.</li>
+      <li>If the menu says <b>"Email uploads are off: Port 25 is already in use"</b>, another app on your Mac is using the
+        mail ports. Quit it and restart RetroDrop's server.</li>
+    </ul>
+    <h3>The email sends but nothing arrives</h3>
+    <ul>
+      <li>Check that the email was sent <b>from</b> the RetroDrop account, not your regular email account.</li>
+      <li>On the phone, open the <b>Outbox</b> in Mail. If messages are stuck there, the Mac's address has probably changed.
+        Update the Outgoing Host Name.</li>
+    </ul>
+    <h3>Still stuck?</h3>
+    <p><a href="https://github.com/samir-bujawdeh/RetroDrop/issues">Open an issue</a> with your phone model, its iOS
+      version, and what the RetroDrop menu shows.</p>
+  </div>
+</main>
+
+<div class="stripes thin"></div>
+<footer>
+  <div class="wrap">
+    <span><a href="../">RetroDrop</a> · <a href="../old-iphone-photos-to-mac/">Old iPhone photos guide</a> · <a href="https://github.com/samir-bujawdeh/RetroDrop">GitHub</a></span>
+    <span>Not affiliated with Apple Inc. iPhone, Mac and Safari are trademarks of Apple Inc.</span>
+  </div>
+</footer>
+</body>
+</html>
