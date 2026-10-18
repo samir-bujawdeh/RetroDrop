@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RetroDrop: get photos off old iPhones, onto your Mac</title>
+<meta name="description" content="Free Mac menu bar app that gets photos and videos off old iPhones (3GS, 4 and friends) over Wi‑Fi. No cable, nothing to install on the phone.">
+<link rel="icon" type="image/png" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon.png">
+<meta name="theme-color" content="#FBF3E6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1424" media="(prefers-color-scheme: dark)">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="RetroDrop: get photos off old iPhones">
+<meta property="og:description" content="Free Mac menu bar app. Send photos and videos from an iPhone 3GS, 4 and friends to your Mac over Wi‑Fi. No cable, nothing to install on the phone.">
+<meta property="og:image" content="https://samir-bujawdeh.github.io/RetroDrop/img/social-card.png">
+<meta property="og:url" content="https://samir-bujawdeh.github.io/RetroDrop/">
+<meta name="twitter:card" content="summary_large_image">
+
+<style>
+:root {
+  --bg: #FBF3E6;
+  --bg-2: #F4E6D2;
+  --surface: #FFFAF2;
+  --ink: #2B1C3A;
+  --ink-2: #5E4560;
+  --line: #E8D6BE;
+  --plum: #6B2D5C;
+  --orange: #E0703A;
+  --sun: #F6C445;
+  --red: #D9483B;
+  --amber: #EE8A3A;
+  --link: #B54A22;
+  --shadow: 0 24px 60px -24px rgba(64, 26, 54, .45);
+  --radius: 18px;
+  --max: 1080px;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1B1424;
+    --bg-2: #22192D;
+    --surface: #2A2035;
+    --ink: #F6EBDD;
+    --ink-2: #C9B6C2;
+    --line: #3D3048;
+    --link: #F4A36B;
+    --shadow: 0 24px 60px -24px rgba(0, 0, 0, .8);
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--link); }
+h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 .5em; }
+h2 { font-size: clamp(28px, 4vw, 38px); }
+h3 { font-size: 20px; }
+p { margin: 0 0 1em; }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+section { padding: 72px 0; }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--orange); }
+.muted { color: var(--ink-2); }
+
+/* Retro stripes, used as dividers */
+.stripes { height: 40px; background: linear-gradient(to bottom,
+  var(--sun) 0 25%, var(--amber) 25% 50%, var(--red) 50% 75%, var(--plum) 75% 100%); }
+.stripes.thin { height: 16px; }
+
+/* Header */
+header.top { position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px); background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+header.top .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; color: var(--ink); text-decoration: none; }
+.brand img { width: 30px; height: 30px; }
+nav { margin-left: auto; display: flex; gap: 22px; font-size: 15px; }
+nav a { color: var(--ink-2); text-decoration: none; }
+nav a:hover { color: var(--ink); }
+@media (max-width: 640px) { nav a:not(.gh) { display: none; } }
+
+/* Hero */
+.hero { position: relative; overflow: hidden; padding: 64px 0 0; }
+.hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+.hero h1 { font-size: clamp(40px, 6.4vw, 66px); font-weight: 800; }
+.hero h1 .accent { background: linear-gradient(90deg, var(--plum), var(--red) 55%, var(--amber));
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+@media (prefers-color-scheme: dark) {
+  .hero h1 .accent { background: linear-gradient(90deg, #F08A8A, var(--amber) 55%, var(--sun));
+    -webkit-background-clip: text; background-clip: text; }
+}
+.hero .lede { font-size: 20px; color: var(--ink-2); max-width: 34em; }
+.cta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 28px 0 10px; }
+.btn { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 700;
+  border-radius: 14px; padding: 14px 22px; font-size: 17px; transition: transform .15s ease, box-shadow .15s ease; }
+.btn:hover { transform: translateY(-2px); }
+.btn-primary { color: #FFF4E0; background: linear-gradient(135deg, var(--plum), var(--red) 55%, #F4A340);
+  box-shadow: 0 12px 30px -10px rgba(217, 72, 59, .6); }
+.btn-primary small { display: block; font-weight: 500; font-size: 12.5px; opacity: .85; }
+.btn-primary svg { flex: none; }
+.btn-ghost { color: var(--ink); border: 1.5px solid var(--line); background: var(--surface); }
+.fineprint { font-size: 14px; color: var(--ink-2); }
+.hero-art { position: relative; display: flex; justify-content: center; padding-bottom: 40px; }
+.hero-art::before { content: ""; position: absolute; width: 360px; height: 360px; border-radius: 50%;
+  top: 20px; left: 50%; transform: translateX(-50%);
+  background: radial-gradient(circle at 50% 40%, #FFD27A, #F7894A 70%); opacity: .9; }
+.hero-art img { position: relative; width: 300px; border-radius: 14px; box-shadow: var(--shadow); }
+@media (max-width: 860px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .hero-art::before { width: 300px; height: 300px; }
+}
+
+/* Phones strip */
+.phones { padding: 26px 0; background: var(--bg-2); border-block: 1px solid var(--line); }
+.phones .wrap { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: center; }
+.chip { font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--surface);
+  border: 1px solid var(--line); color: var(--ink-2); }
+
+/* Cards */
+.grid { display: grid; gap: 22px; }
+.grid.two { grid-template-columns: repeat(2, 1fr); }
+.grid.three { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 860px) { .grid.two, .grid.three { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+.card .tag { display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: .04em;
+  padding: 4px 10px; border-radius: 999px; color: #FFF4E0; background: var(--orange); margin-bottom: 12px; }
+.card .tag.mail { background: var(--plum); }
+.card ol { margin: 0; padding-left: 20px; }
+.card li { margin: 6px 0; }
+.feature h3 { display: flex; align-items: center; gap: 10px; }
+.feature .ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex: none;
+  background: color-mix(in srgb, var(--orange) 16%, transparent); color: var(--orange); }
+
+/* Table */
+.table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden; font-size: 16px; }
+.table th, .table td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.table tr:last-child td { border-bottom: 0; }
+.table th { background: var(--bg-2); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); }
+.scroll-x { overflow-x: auto; }
+
+/* Install steps */
+.steps { counter-reset: step; display: grid; gap: 36px; }
+.step { display: grid; grid-template-columns: 1fr 1.1fr; gap: 32px; align-items: center; }
+.step h3::before { counter-increment: step; content: counter(step); display: inline-grid; place-items: center;
+  width: 30px; height: 30px; margin-right: 10px; border-radius: 50%; background: var(--orange); color: #FFF4E0;
+  font-size: 15px; vertical-align: 2px; }
+.step img { max-height: 420px; width: auto; margin: 0 auto;
+  filter: drop-shadow(0 16px 24px rgba(64, 26, 54, .28)); } /* follows the image's shape, not its transparent margin */
+.step.wide { grid-template-columns: 1fr; gap: 16px; }
+.step.wide img { max-height: none; width: 100%; }
+@media (max-width: 860px) { .step { grid-template-columns: 1fr; } }
+.why { margin-top: 40px; }
+
+/* FAQ */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; margin: 12px 0; }
+summary { cursor: pointer; font-weight: 700; }
+details p { margin: 12px 0 0; color: var(--ink-2); }
+
+/* Final CTA + footer */
+.final { text-align: center; }
+.final .cta { justify-content: center; }
+footer { padding: 28px 0 40px; font-size: 14px; color: var(--ink-2); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; }
+code { font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg-2); padding: 2px 6px; border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="img/favicon-64.png" alt="">RetroDrop</a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#phones">Phones</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a class="gh" href="https://github.com/samir-bujawdeh/RetroDrop">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Free · Open source · For Mac</div>
+      <h1>Get photos off <span class="accent">old iPhones.</span></h1>
+      <p class="lede">RetroDrop is a little menu bar app that pulls photos and videos off your iPhone 3GS, iPhone 4 and
+        friends over Wi‑Fi, straight into your Mac. No cable, no jailbreak, nothing to install on the phone.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          <span>Download for Mac<small>Free · macOS 14 or later</small></span>
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/samir-bujawdeh/RetroDrop">View source</a>
+      </div>
+      <p class="fineprint">Apple silicon &amp; Intel · <a href="#install">Install steps</a></p>
+    </div>
+    <div class="hero-art">
+      <img src="img/screenshot-menu.png" width="320" height="726"
+           alt="The RetroDrop menu: server running, the Safari and mail addresses, and a grid of received photos and videos">
+    </div>
+  </div>
+  <div class="stripes"></div>
+</section>
+
+<div class="phones">
+  <div class="wrap">
+    <span class="muted" style="font-size:14px">Made for</span>
+    <span class="chip">iPhone 3GS</span><span class="chip">iPhone 4</span><span class="chip">iPhone 4S</span>
+    <span class="chip">iPhone 5</span><span class="chip">iPod touch</span><span class="chip">iPhone 2G &amp; 3G</span>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h2>Two ways in, depending on your phone</h2>
+    <p class="muted" style="max-width:40em">Old iPhones can't use AirDrop, iCloud or modern websites. RetroDrop turns your Mac
+      into a tiny server on your home Wi‑Fi that they <em>can</em> talk to. Everything stays on your network.</p>
+    <div class="grid two" style="margin-top:28px">
+      <div class="card">
+        <span class="tag">iOS 6 and later</span>
+        <h3>Upload from Safari</h3>
+        <ol>
+          <li>Click <b>Start Server</b> in the RetroDrop menu.</li>
+          <li>On the phone, open Safari and type the address RetroDrop shows, like <code>http://192.168.1.23:8765</code>.</li>
+          <li>Tap <b>Choose File</b>, pick photos or videos, tap <b>Upload</b>.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <span class="tag mail">iOS 5 and earlier</span>
+        <h3>"Email" them to your Mac</h3>
+        <ol>
+          <li>Set up a mail account on the phone that points at your Mac. It's a one-time, two-minute setup.</li>
+          <li>In Photos, tap <b>Share → Email Photo</b> and send.</li>
+          <li>RetroDrop plays the mail server and keeps the attachments. Nothing is actually emailed.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="grid three">
+      <div class="card feature"><h3><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v3H3z"/><rect x="5" y="11" width="5" height="5" rx="1"/><rect x="14" y="11" width="5" height="5" rx="1"/></svg></span>Photos in your menu bar</h3>
+        <p class="muted">New arrivals show up as thumbnails. Drag one onto the desktop or into any app, or double-click to open.</p></div>
+      <div class="card feature"><h3><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z" fill="currentColor"/></svg></span>Photos and videos</h3>
+        <p class="muted">Long videos too. Thumbnails show each clip's length.</p></div>
+      <div class="card feature"><h3><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="m9 15 2 2 4-4"/></svg></span>Never overwrites</h3>
+        <p class="muted">Old iPhones call everything <code>image.jpg</code>. RetroDrop adds the date and time, so nothing is lost.</p></div>
+      <div class="card feature"><h3><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M7.8 16.2a6 6 0 0 1 0-8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 19.1a10 10 0 0 1 0-14.2M19.1 4.9a10 10 0 0 1 0 14.2"/></svg></span>Finds your address</h3>
+        <p class="muted">Always shows the address your phone needs, with a built-in "How to Connect a Phone" guide.</p></div>
+      <div class="card feature"><h3><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span>Stays on your network</h3>
+        <p class="muted">No accounts, no cloud, no tracking. The phone talks straight to your Mac.</p></div>
+      <div class="card feature"><h3><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg></span>Tiny and native</h3>
+        <p class="muted">A small Mac app with no dependencies, for Apple silicon and Intel. Free and open source (MIT).</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="phones" style="background:var(--bg-2);border-block:1px solid var(--line)">
+  <div class="wrap">
+    <div class="eyebrow">Compatibility</div>
+    <h2>Which phones work?</h2>
+    <div class="scroll-x">
+      <table class="table">
+        <thead><tr><th>Phone software</th><th>How to send</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>iOS 6 – iOS 10<br><span class="muted">iPhone 3GS, 4, 4S, 5, 5c</span></td><td><b>Safari</b></td><td>Photos and videos, several at once</td></tr>
+          <tr><td>iOS 5<br><span class="muted">e.g. an iPhone 3GS or 4 that was never updated</span></td><td><b>Mail</b></td><td>Safari can't upload files before iOS 6</td></tr>
+          <tr><td>iPhone OS 3 – iOS 4<br><span class="muted">iPhone 2G, 3G, 3GS</span></td><td><b>Mail</b></td><td>Should work the same way, but untested. <a href="https://github.com/samir-bujawdeh/RetroDrop/issues">Tell us how it goes!</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="margin-top:16px">Tested so far: iPhone 3GS on iOS 6 (Safari) and iPhone 4 on iOS 5 (Mail).
+      Your Mac needs macOS 14 Sonoma or later, on the same Wi‑Fi as the phone.</p>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <div class="eyebrow">Install</div>
+    <h2>Up and running in a minute</h2>
+    <p class="muted" style="max-width:40em">RetroDrop isn't notarized by Apple yet, so macOS asks you to confirm the first time
+      you open it. Here's exactly what to click. You only do this once.</p>
+    <div class="steps" style="margin-top:36px">
+      <div class="step">
+        <div><h3>Drag it to Applications</h3>
+          <p class="muted"><a href="https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg">Download RetroDrop</a>,
+            open <code>RetroDrop.dmg</code>, and drag RetroDrop onto Applications. Then eject the RetroDrop disk.</p></div>
+        <img src="img/install/1-open-dmg.png" width="612" height="413" loading="lazy" alt="The RetroDrop disk image window: drag RetroDrop onto Applications">
+      </div>
+      <div class="step">
+        <div><h3>Open it, then click Done</h3>
+          <p class="muted">The first time you open RetroDrop, macOS stops it. Click <b>Done</b>, <em>not</em> Move to Trash.</p></div>
+        <img src="img/install/2-click-done.png" width="469" height="306" loading="lazy" alt="The “RetroDrop Not Opened” message, with Done highlighted">
+      </div>
+      <div class="step wide">
+        <div><h3>Click Open Anyway in Settings</h3>
+          <p class="muted">Open <b>System Settings → Privacy &amp; Security</b>, scroll down to <b>Security</b>, and click
+            <b>Open Anyway</b> next to the RetroDrop message.</p></div>
+        <img src="img/install/3-open-anyway-settings-crop.png" width="926" height="210" loading="lazy" alt="Privacy &amp; Security settings, with the Open Anyway button highlighted">
+      </div>
+      <div class="step">
+        <div><h3>Confirm, and you're done</h3>
+          <p class="muted">Click <b>Open Anyway</b> once more and enter your password or use Touch ID. Look for the phone
+            icon in your menu bar. If macOS asks about incoming network connections, click <b>Allow</b>.</p></div>
+        <img src="img/install/4-open-anyway-confirm.png" width="470" height="380" loading="lazy" alt="The “Open RetroDrop?” confirmation, with Open Anyway highlighted">
+      </div>
+    </div>
+    <div class="card why">
+      <h3>Why does macOS warn about it?</h3>
+      <p class="muted" style="margin:0">Apple charges developers a yearly fee to have apps "notarized", that is, checked before
+        release. RetroDrop is a free hobby project and isn't notarized yet, so macOS can't vouch for it. It doesn't mean
+        anything was found wrong. The <a href="https://github.com/samir-bujawdeh/RetroDrop">complete source code</a> is public, and
+        notarization is planned for a future release.</p>
+    </div>
+    <p class="muted" style="margin-top:24px">Full walkthrough, including the one-time Mail setup for iOS 5 phones:
+      <a href="https://github.com/samir-bujawdeh/RetroDrop/blob/main/docs/SETUP.md">setup guide</a>.</p>
+  </div>
+</section>
+
+<section id="faq" style="background:var(--bg-2);border-block:1px solid var(--line)">
+  <div class="wrap" style="max-width:820px">
+    <div class="eyebrow">FAQ</div>
+    <h2>Questions</h2>
+    <details><summary>Is it really free?</summary>
+      <p>Yes. No ads, no account, no paid version. It's open source under the MIT license.</p></details>
+    <details><summary>Does it need the internet?</summary>
+      <p>No. The phone talks directly to your Mac over your Wi‑Fi. Nothing goes to the cloud.</p></details>
+    <details><summary>Is it safe?</summary>
+      <p>RetroDrop only works on your local network and only saves files into one folder. While the server is running,
+        anyone on the same Wi‑Fi could send files to that folder, because old phones can't do modern security. So use it
+        on your home network, not public Wi‑Fi, and stop the server when you're done.</p></details>
+    <details><summary>Why not HTTPS?</summary>
+      <p>Old iPhones can't connect to modern secure websites. That's the whole reason RetroDrop exists. It's meant for
+        your home network only.</p></details>
+    <details><summary>Can't I just use a cable?</summary>
+      <p>You can! Image Capture over USB still works. RetroDrop is for when you'd rather not dig out a 30‑pin cable, and
+        only want the photos you pick to show up, ready to drag anywhere.</p></details>
+    <details><summary>My phone isn't listed. Will it work?</summary>
+      <p>If it runs iOS 6 or later, use Safari. If it's older, use Mail. Please
+        <a href="https://github.com/samir-bujawdeh/RetroDrop/issues">open an issue</a> and tell us how it went, so we can
+        add it to the list.</p></details>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <img src="img/icon.png" width="120" height="120" alt="" style="margin:0 auto 18px">
+    <h2>Give your old iPhone a job again.</h2>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/samir-bujawdeh/RetroDrop/releases/latest/download/RetroDrop.dmg">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        <span>Download for Mac<small>Free · macOS 14 or later</small></span>
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="stripes thin"></div>
+<footer>
+  <div class="wrap">
+    <span>RetroDrop · Free and open source (MIT) · <a href="https://github.com/samir-bujawdeh/RetroDrop">GitHub</a></span>
+    <span>Not affiliated with Apple Inc. iPhone, Mac and Safari are trademarks of Apple Inc.</span>
+  </div>
+</footer>
+</body>
+</html>
