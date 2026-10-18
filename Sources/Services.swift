@@ -58,10 +58,10 @@ final class FileSaver {
     }
 }
 
-// MARK: - Web upload (Safari on iOS 6 and later)
+// MARK: - Web page (Safari): uploads on iOS 6+, downloads from the Mac on any iOS
 
 enum WebUpload {
-    static func handle(_ conn: Connection, saver: FileSaver) {
+    static func handle(_ conn: Connection, saver: FileSaver, outbox: Outbox) {
         guard let requestLine = conn.readLine() else { return }
         var headers: [String: String] = [:]
         while let line = conn.readLine(), !line.isEmpty {
@@ -72,9 +72,18 @@ enum WebUpload {
         }
         let parts = requestLine.split(separator: " ")
         let method = parts.first.map(String.init) ?? "GET"
-        let path = parts.count > 1 ? String(parts[1]) : "/"
+        let target = parts.count > 1 ? String(parts[1]) : "/"
+        let path = String(target.split(separator: "?", maxSplits: 1).first ?? "/")
 
-        if path == "/favicon.ico" || path == "/apple-touch-icon.png" || path.hasPrefix("/apple-touch-icon") {
+        if path.hasPrefix("/out/") {
+            let name = String(path.dropFirst("/out/".count)).removingPercentEncoding ?? ""
+            guard let url = outbox.fileURL(named: name) else {
+                return respond(conn, status: "404 Not Found", body: "")
+            }
+            let type = name.hasSuffix(".mp4") ? "video/mp4" : "image/jpeg"
+            return serveFile(conn, url: url, contentType: type, range: headers["range"], headOnly: method == "HEAD")
+        }
+        if path != "/" {
             return respond(conn, status: "404 Not Found", body: "")
         }
 
@@ -91,7 +100,7 @@ enum WebUpload {
                 message = "<p style=\"color:#080\">Saved \(saved.count) file(s):<br>\(names)</p>"
             }
         }
-        respond(conn, status: "200 OK", body: page(message: message))
+        respond(conn, status: "200 OK", body: page(message: message, outbox: outbox.snapshot()))
     }
 
     private static func respond(_ conn: Connection, status: String, body: String) {
@@ -101,14 +110,86 @@ enum WebUpload {
         conn.write(data)
     }
 
+    /// Sends a file, honouring "Range: bytes=..." requests. Mobile Safari only plays videos from
+    /// servers that support ranges.
+    private static func serveFile(_ conn: Connection, url: URL, contentType: String, range: String?, headOnly: Bool) {
+        guard let handle = try? FileHandle(forReadingFrom: url),
+              let size = (try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? NSNumber)?.int64Value
+        else { return respond(conn, status: "404 Not Found", body: "") }
+        defer { try? handle.close() }
+
+        var first: Int64 = 0, last = size - 1, status = "200 OK"
+        if let range, range.hasPrefix("bytes="), !range.contains(",") {
+            let spec = range.dropFirst("bytes=".count).split(separator: "-", omittingEmptySubsequences: false)
+            if spec.count == 2 {
+                if spec[0].isEmpty, let n = Int64(spec[1]) {            // "-500": the last 500 bytes
+                    first = max(0, size - n)
+                } else if let a = Int64(spec[0]) {                      // "100-" or "100-199"
+                    first = a
+                    if let b = Int64(spec[1]) { last = min(b, size - 1) }
+                }
+                guard first <= last, first < size else {
+                    conn.write("HTTP/1.1 416 Range Not Satisfiable\r\nContent-Range: bytes */\(size)\r\n"
+                               + "Content-Length: 0\r\nConnection: close\r\n\r\n")
+                    return
+                }
+                status = "206 Partial Content"
+            }
+        }
+        let length = last - first + 1
+        var head = "HTTP/1.1 \(status)\r\nContent-Type: \(contentType)\r\nContent-Length: \(length)\r\n"
+            + "Accept-Ranges: bytes\r\nConnection: close\r\n"
+        if status.hasPrefix("206") { head += "Content-Range: bytes \(first)-\(last)/\(size)\r\n" }
+        conn.write(head + "\r\n")
+        guard !headOnly else { return }
+
+        try? handle.seek(toOffset: UInt64(first))
+        var remaining = length
+        while remaining > 0 {
+            let chunk = handle.readData(ofLength: Int(min(remaining, 256 * 1024)))
+            if chunk.isEmpty { break }
+            conn.write(chunk)
+            remaining -= Int64(chunk.count)
+        }
+    }
+
     private static func escape(_ s: String) -> String {
         s.replacingOccurrences(of: "&", with: "&amp;").replacingOccurrences(of: "<", with: "&lt;")
             .replacingOccurrences(of: ">", with: "&gt;").replacingOccurrences(of: "\"", with: "&quot;")
     }
 
-    /// Plain HTML that old Mobile Safari renders fine; no HTTPS, no modern JS.
-    private static func page(message: String) -> String {
-        """
+    private static func duration(_ seconds: Double?) -> String {
+        guard let seconds else { return "" }
+        let s = Int(seconds.rounded())
+        return String(format: " %d:%02d", s / 60, s % 60)
+    }
+
+    /// Plain HTML that old Mobile Safari renders fine; no HTTPS, no modern JS or CSS.
+    private static func page(message: String, outbox: [OutboxItem]) -> String {
+        var fromMac = ""
+        if !outbox.isEmpty {
+            let photos = outbox.filter { $0.kind == .photo }
+            let videos = outbox.filter { $0.kind == .video }
+            fromMac += "<h3 style=\"margin-top:28px\">From your Mac</h3>"
+            if !photos.isEmpty {
+                fromMac += "<p>Tap a photo to open it, then <b>touch and hold</b> it and tap <b>Save Image</b>.</p><p>"
+                for item in photos.reversed() {
+                    fromMac += "<a href=\"/out/\(item.file)\"><img src=\"/out/\(item.thumb)\" height=\"96\" "
+                        + "alt=\"\(escape(item.name))\" style=\"margin:0 6px 6px 0;border-radius:6px\"></a>"
+                }
+                fromMac += "</p>"
+            }
+            if !videos.isEmpty {
+                fromMac += "<p>Tap a video to play it. Safari can't save videos to your phone. To keep one, "
+                    + "receive it by Mail instead (see How to Connect a Phone in the RetroDrop menu).</p>"
+                for item in videos.reversed() {
+                    fromMac += "<p><a href=\"/out/\(item.file)\"><img src=\"/out/\(item.thumb)\" height=\"72\" "
+                        + "style=\"vertical-align:middle;margin-right:8px;border-radius:6px\">"
+                        + "&#9654;\(duration(item.duration)) \(escape(item.name))</a></p>"
+                }
+            }
+        }
+        return """
         <html><head><meta name="viewport" content="width=device-width">
         <title>RetroDrop</title></head>
         <body style="font-family:Helvetica;margin:16px;background:#fff;color:#222">
@@ -122,6 +203,7 @@ enum WebUpload {
         </form>
         <p style="color:#888;font-size:13px">Button greyed out? Your phone is on iOS 5 or older &mdash;
         send by email instead. On the Mac, open the RetroDrop menu &gt; How to Connect a Phone.</p>
+        \(fromMac)
         </body></html>
         """
     }
@@ -130,7 +212,7 @@ enum WebUpload {
 // MARK: - Email upload (any iPhone's Mail app)
 //
 // A tiny outgoing-mail (SMTP) server that saves attachments instead of delivering mail,
-// plus an empty incoming-mail (POP3) server so the phone accepts the account setup.
+// plus an incoming-mail (POP3) server that delivers whatever the Mac is sending to the phone.
 // Any username and password are accepted. Nothing is ever sent onwards.
 
 enum MailUpload {
@@ -182,23 +264,78 @@ enum MailUpload {
         }
     }
 
-    static func handlePOP(_ conn: Connection) {
+    /// The phone's inbox: one message per item the Mac is sending. Numbering is fixed for the session,
+    /// as POP3 requires. UIDL lets the phone download each message only once. Deleting is accepted but
+    /// ignored; items leave the outbox only when removed on the Mac.
+    static func handlePOP(_ conn: Connection, outbox: Outbox) {
+        let mailbox: [(item: OutboxItem, url: URL, size: Int)] = outbox.snapshot().compactMap { item in
+            let url = outbox.messageURL(for: item)
+            guard let size = (try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? NSNumber)?.intValue
+            else { return nil }
+            return (item, url, size)
+        }
+        func message(_ arg: String?) -> (index: Int, entry: (item: OutboxItem, url: URL, size: Int))? {
+            guard let arg, let n = Int(arg), n >= 1, n <= mailbox.count else { return nil }
+            return (n, mailbox[n - 1])
+        }
+
         conn.writeLine("+OK RetroDrop")
         while let line = conn.readLine() {
-            switch line.split(separator: " ").first.map({ $0.uppercased() }) ?? "" {
+            let words = line.split(separator: " ").map(String.init)
+            let arg = words.count > 1 ? words[1] : nil
+            switch words.first?.uppercased() ?? "" {
             case "STAT":
-                conn.writeLine("+OK 0 0")
-            case "LIST", "UIDL":
-                conn.writeLine("+OK 0 messages")
+                conn.writeLine("+OK \(mailbox.count) \(mailbox.reduce(0) { $0 + $1.size })")
+            case "LIST":
+                if arg != nil {
+                    guard let m = message(arg) else { conn.writeLine("-ERR No such message"); continue }
+                    conn.writeLine("+OK \(m.index) \(m.entry.size)")
+                } else {
+                    conn.writeLine("+OK \(mailbox.count) messages")
+                    for (i, m) in mailbox.enumerated() { conn.writeLine("\(i + 1) \(m.size)") }
+                    conn.writeLine(".")
+                }
+            case "UIDL":
+                if arg != nil {
+                    guard let m = message(arg) else { conn.writeLine("-ERR No such message"); continue }
+                    conn.writeLine("+OK \(m.index) \(m.entry.item.id)")
+                } else {
+                    conn.writeLine("+OK")
+                    for (i, m) in mailbox.enumerated() { conn.writeLine("\(i + 1) \(m.item.id)") }
+                    conn.writeLine(".")
+                }
+            case "RETR":
+                guard let m = message(arg), let data = try? Data(contentsOf: m.entry.url) else {
+                    conn.writeLine("-ERR No such message"); continue
+                }
+                conn.writeLine("+OK \(data.count) octets")
+                conn.write(data)  // CRLF throughout, no line starts with "." (see Outbox.emailMessage)
+                conn.writeLine(".")
+            case "TOP":
+                // Headers plus the first N body lines; the phone uses this to preview messages.
+                guard let m = message(arg), words.count > 2, let n = Int(words[2]),
+                      let data = try? Data(contentsOf: m.entry.url) else {
+                    conn.writeLine("-ERR No such message"); continue
+                }
+                let text = String(decoding: data, as: UTF8.self)
+                let parts = text.components(separatedBy: "\r\n\r\n")
+                let body = parts.dropFirst().joined(separator: "\r\n\r\n").components(separatedBy: "\r\n")
+                conn.writeLine("+OK")
+                conn.write(parts[0] + "\r\n\r\n")
+                for l in body.prefix(n) { conn.writeLine(l) }
                 conn.writeLine(".")
             case "CAPA":
                 conn.writeLine("+OK")
                 conn.writeLine("USER")
                 conn.writeLine("UIDL")
+                conn.writeLine("TOP")
                 conn.writeLine(".")
             case "QUIT":
                 conn.writeLine("+OK Bye")
                 return
+            case "DELE":
+                guard message(arg) != nil else { conn.writeLine("-ERR No such message"); continue }
+                conn.writeLine("+OK")
             case "USER", "PASS", "NOOP", "RSET":
                 conn.writeLine("+OK")
             default:

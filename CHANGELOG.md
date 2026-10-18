@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Send photos and videos from the Mac to the phone.** Choose *Send Photos & Videos to Phone…*,
+  drop files on the menu bar icon, or use Finder's *Open With → RetroDrop*. Files are converted for old
+  iPhones (photos → sRGB JPEG up to 2048 px; videos → H.264 Baseline 640×480 + AAC). The phone picks
+  them up from a new "From your Mac" section in Safari, or as emails in the RetroDrop Mail account.
+- Mail server now supports TOP, LIST/UIDL for single messages, and DELE.
+
 ## 1.0.0
 
 First public release.
