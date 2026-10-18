@@ -24,8 +24,9 @@ All tests should pass. Then quit that copy and try a real phone if you can.
 - `RetroDrop-<version>.dmg`: the disk image with the drag-to-Applications window
 - `RetroDrop.dmg`: the same file under a version-free name
 - `RetroDrop-<version>.zip`: the plain app, for people who prefer a zip
+- `RetroDrop.dmg.sig`: the update signature that *Check for Updates…* verifies before installing
 
-Create a GitHub release tagged `v<version>`, paste the changelog entry, and attach all three.
+Create a GitHub release tagged `v<version>`, paste the changelog entry, and attach all four.
 The README's download button links to `releases/latest/download/RetroDrop.dmg`, so it only keeps
 working if **every release includes `RetroDrop.dmg`**.
 
@@ -35,8 +36,20 @@ live in `scripts/dmg-settings.py`.
 
 ```bash
 git tag v$(cat VERSION) && git push --tags
-gh release create v$(cat VERSION) dist/RetroDrop-$(cat VERSION).dmg dist/RetroDrop.dmg dist/RetroDrop-$(cat VERSION).zip --notes-file <(sed -n '/^## /,$p' CHANGELOG.md | awk 'NR>1 && /^## /{exit} 1')
+gh release create v$(cat VERSION) dist/RetroDrop-$(cat VERSION).dmg dist/RetroDrop.dmg dist/RetroDrop.dmg.sig dist/RetroDrop-$(cat VERSION).zip --notes-file <(sed -n '/^## /,$p' CHANGELOG.md | awk 'NR>1 && /^## /{exit} 1')
 ```
+
+## The update signing key
+
+*Check for Updates…* installs a release only if `RetroDrop.dmg.sig` matches the public key built into
+the app (`RDUpdatePublicKey` in `Resources/Info.plist`). The private key is in
+`~/.retrodrop/update-signing-key`, outside the repo, and `scripts/build.sh` uses it automatically.
+
+**Back it up** (for example in a password manager). If it's lost, existing copies of RetroDrop will
+refuse every future update, and everyone would have to download a new version by hand once. Never commit
+it or share it: whoever has it can publish updates that RetroDrop will install.
+
+Run the updater tests before releasing: `python3 tests/test_updater.py`.
 
 ## Optional: sign and notarize
 

@@ -63,6 +63,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         refresh()
 
         if args.contains("--start") { controller.start() }
+        // After an update, come back the way we were: server running if it was.
+        Updater.shared.relaunchArguments = { [controller] in controller.isRunning ? ["--start"] : [] }
+        if args.contains("--update-now") { Updater.shared.checkForUpdates(interactive: false) }  // scripting/tests
         // `--send file1 file2 ...` queues files for the phone (scripting and tests).
         if let i = args.firstIndex(of: "--send") {
             let files = args[(i + 1)...].prefix { !$0.hasPrefix("-") }.map { URL(fileURLWithPath: $0) }
@@ -128,6 +131,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         loginItem.action = #selector(toggleLogin)
 
         let about = item("About RetroDrop", #selector(showAbout))
+        let updates = item("Check for Updates…", #selector(checkForUpdates))
         let quit = NSMenuItem(title: "Quit RetroDrop", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
 
         [statusLine, errorLine, warningLine, noticeLine, toggleItem, .separator(),
@@ -137,7 +141,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
          photosItem, .separator(),
          .sectionHeader(title: "Send to phone"), sendItem, preparingLine, waitingItem, .separator(),
          folderItem, changeFolder, loginItem, .separator(),
-         about, quit].forEach(menu.addItem)
+         about, updates, quit].forEach(menu.addItem)
     }
 
     private func item(_ title: String, _ action: Selector) -> NSMenuItem {
@@ -321,6 +325,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(ip, forType: .string)
         }
+    }
+
+    @objc private func checkForUpdates() {
+        Updater.shared.checkForUpdates()
     }
 
     @objc private func showAbout() {

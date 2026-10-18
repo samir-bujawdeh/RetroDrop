@@ -56,6 +56,13 @@ if [[ -x .venv/bin/dmgbuild ]]; then
   # releases/latest/download/RetroDrop.dmg link always serves the newest release.
   cp "$DMG" dist/RetroDrop.dmg
   echo "==> Packaged $DMG and dist/RetroDrop.dmg"
+  # Signature that the in-app updater checks before installing (key: ~/.retrodrop/update-signing-key).
+  if [[ -f "$HOME/.retrodrop/update-signing-key" ]]; then
+    swift scripts/update-signing.swift sign dist/RetroDrop.dmg >/dev/null
+    echo "==> Signed dist/RetroDrop.dmg.sig for the updater"
+  else
+    echo "!!  No update signing key: the in-app updater will refuse this release (see scripts/update-signing.swift)"
+  fi
 else
   echo "!!  Skipped the .dmg: dmgbuild not found (see the comment in scripts/build.sh)"
 fi

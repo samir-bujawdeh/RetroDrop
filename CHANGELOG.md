@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- **Check for Updates…** in the menu. If a newer version is available, *Install and Relaunch* downloads it,
+  verifies it, swaps it in and restarts, with the server back on if it was running. RetroDrop only contacts
+  GitHub when you click the button.
+- Updates are signed: RetroDrop installs one only if its signature matches the key built into the app, it's
+  the same app, it's the expected version, and its code signature is intact.
+
 ## 1.1.0
 
 - **Send photos and videos from the Mac to the phone.** Choose *Send Photos & Videos to Phone…*,

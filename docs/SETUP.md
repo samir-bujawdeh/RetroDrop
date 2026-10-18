@@ -10,6 +10,7 @@ kinds of old iPhone. If you get stuck, jump to [Troubleshooting](#troubleshootin
 - [4b. Send with Mail (iOS 5 and earlier)](#4b-send-with-mail-ios-5-and-earlier)
 - [5. Get your photos](#5-get-your-photos)
 - [6. Send photos and videos to the phone](#6-send-photos-and-videos-to-the-phone)
+- [Updating RetroDrop](#updating-retrodrop)
 - [Keep your Mac's address from changing](#keep-your-macs-address-from-changing)
 - [Troubleshooting](#troubleshooting)
 
@@ -176,6 +177,17 @@ RetroDrop also works the other way round: from your Mac to the phone.
      photo or video arrives as its own email. Touch and hold it to save it to your Camera Roll.
 
 Files stay in **Waiting on Phone** until you remove them, so several phones can pick them up.
+
+## Updating RetroDrop
+
+In the RetroDrop menu, choose **Check for Updates…**. If a new version is available, you'll see what's
+new. Click **Install and Relaunch**: RetroDrop downloads the update, checks that it's genuine (signed by
+the RetroDrop developer), replaces itself and restarts. If the server was running, it starts again.
+
+- RetroDrop only checks when you click the button. It never checks or connects on its own.
+- It can update itself only when it's in your **Applications** folder. If it's somewhere else, it
+  downloads the new version for you to install by hand.
+- Versions 1.0 and 1.1 don't have this button. Download the latest version once, the normal way.
 
 ## Keep your Mac's address from changing
 

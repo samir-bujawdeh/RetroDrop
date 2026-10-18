@@ -27,6 +27,7 @@
       </array>
     </dict>
   </array>
+  <key>RDUpdatePublicKey</key><string>Yg//zryAcvLy+7HDEZ/VXkFHRgXafTF3zXbka5vCl/E=</string>
   <key>NSLocalNetworkUsageDescription</key>
   <string>RetroDrop receives photos and videos from phones on your Wi-Fi network.</string>
 </dict>

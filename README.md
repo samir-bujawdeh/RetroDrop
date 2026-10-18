@@ -127,8 +127,9 @@ you can [build it yourself](#build-from-source). Notarization is planned for a f
 
 ## Privacy and security
 
-- RetroDrop only works on your local network. It never connects to the internet, has no accounts,
-  and collects no data.
+- RetroDrop works on your local network. It has no accounts and collects no data. The only time it
+  connects to the internet is when you click **Check for Updates…**: it asks GitHub for the latest
+  version, and downloads it if you choose to install it. It never checks on its own.
 - The "mail server" never sends mail anywhere. It only saves attachments into your folder.
 - While the server is running, **anyone on the same Wi‑Fi can send files to your RetroDrop folder**.
   There is no password, because old phones can't do modern security. Stop the server when you're done,
@@ -190,7 +191,14 @@ Maintainers: see [docs/RELEASING.md](docs/RELEASING.md) for making a release.
 **Why not HTTPS?** Old iPhones can't connect to modern secure websites. That's the whole reason this
 tool exists. RetroDrop is meant for your home network only.
 
-**Does it need the internet?** No. The phone talks directly to your Mac over Wi‑Fi.
+**Does it need the internet?** No. The phone talks directly to your Mac over Wi‑Fi. Only
+*Check for Updates…* uses the internet, and only when you click it.
+
+**How do I update?** In the RetroDrop menu, choose **Check for Updates…**. If there's a new version,
+click **Install and Relaunch**: RetroDrop downloads it, checks it's genuine, and restarts. (Versions
+1.0 and 1.1 don't have this button yet. Download the latest version once, the normal way, and you'll
+have it from then on.) To hear about new versions, you can also **Watch → Custom → Releases** on this
+GitHub page.
 
 **What if another app on my Mac already uses port 8765?** RetroDrop picks the next free port
 (8766, 8767, …), shows the new address in the menu, and keeps using it from then on, so bookmarks
