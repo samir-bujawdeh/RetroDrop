@@ -138,7 +138,7 @@ enum WebUpload {
         }
         let length = last - first + 1
         var head = "HTTP/1.1 \(status)\r\nContent-Type: \(contentType)\r\nContent-Length: \(length)\r\n"
-            + "Accept-Ranges: bytes\r\nConnection: close\r\n"
+            + "Accept-Ranges: bytes\r\nCache-Control: no-cache\r\nConnection: close\r\n"
         if status.hasPrefix("206") { head += "Content-Range: bytes \(first)-\(last)/\(size)\r\n" }
         conn.write(head + "\r\n")
         guard !headOnly else { return }
