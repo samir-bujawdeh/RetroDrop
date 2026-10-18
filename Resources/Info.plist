@@ -14,6 +14,19 @@
   <key>LSApplicationCategoryType</key><string>public.app-category.photography</string>
   <key>LSUIElement</key><true/>
   <key>NSHumanReadableCopyright</key><string>Free and open source (MIT License).</string>
+  <key>CFBundleDocumentTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeName</key><string>Photo or video to send to a phone</string>
+      <key>CFBundleTypeRole</key><string>Viewer</string>
+      <key>LSHandlerRank</key><string>Alternate</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>public.image</string>
+        <string>public.movie</string>
+      </array>
+    </dict>
+  </array>
   <key>NSLocalNetworkUsageDescription</key>
   <string>RetroDrop receives photos and videos from phones on your Wi-Fi network.</string>
 </dict>

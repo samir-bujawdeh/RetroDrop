@@ -7,7 +7,7 @@ import ServiceManagement
 // behaves like Apple's own menu bar items over full-screen apps.
 
 @main
-final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindowDelegate {
     static func main() {
         let app = NSApplication.shared
         let delegate = AppDelegate()
@@ -28,6 +28,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let mailItem = NSMenuItem()
     private let folderItem = NSMenuItem()
     private let loginItem = NSMenuItem()
+    private let sendItem = NSMenuItem()
+    private let preparingLine = NSMenuItem()
+    private let waitingItem = NSMenuItem()
     private let photosView = PhotosMenuView()
     private var bag = Set<AnyCancellable>()
 
@@ -46,6 +49,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem.button?.toolTip = "RetroDrop"
         buildMenu()
         statusItem.menu = menu
+        // Drop photos or videos onto the menu bar icon to send them to the phone.
+        if let window = statusItem.button?.window {
+            window.registerForDraggedTypes([.fileURL])
+            window.delegate = self
+        }
 
         // @Published fires before the value changes, so refresh on the next pass of the
         // main queue (which also runs while the menu is open).
@@ -55,6 +63,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         refresh()
 
         if args.contains("--start") { controller.start() }
+        // `--send file1 file2 ...` queues files for the phone (scripting and tests).
+        if let i = args.firstIndex(of: "--send") {
+            let files = args[(i + 1)...].prefix { !$0.hasPrefix("-") }.map { URL(fileURLWithPath: $0) }
+            controller.send(Array(files))
+        }
+    }
+
+    /// Finder's Open With → RetroDrop, or files dropped on the app icon.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        controller.send(urls)
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -88,6 +106,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let howTo = item("How to Connect a Phone…", #selector(showHowTo))
 
+        sendItem.title = "Send Photos & Videos to Phone…"
+        sendItem.target = self
+        sendItem.action = #selector(chooseFilesToSend)
+        sendItem.image = NSImage(systemSymbolName: "iphone.and.arrow.forward", accessibilityDescription: nil)
+            ?? NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: nil)
+        sendItem.toolTip = "Or drop photos and videos onto the RetroDrop menu bar icon"
+        preparingLine.isEnabled = false
+        waitingItem.submenu = NSMenu()
+
         let photosItem = NSMenuItem()
         photosItem.view = photosView
 
@@ -108,6 +135,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
          .sectionHeader(title: "iOS 5 and earlier · mail server"), mailItem,
          howTo, .separator(),
          photosItem, .separator(),
+         .sectionHeader(title: "Send to phone"), sendItem, preparingLine, waitingItem, .separator(),
          folderItem, changeFolder, loginItem, .separator(),
          about, quit].forEach(menu.addItem)
     }
@@ -144,6 +172,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         folderItem.title = "Saving to “\(controller.folder.lastPathComponent)”"
         folderItem.toolTip = controller.folder.path
         loginItem.state = SMAppService.mainApp.status == .enabled ? .on : .off
+        refreshOutbox()
     }
 
     /// Multi-line note in the menu (menu items don't wrap on their own).
@@ -159,6 +188,62 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         item.attributedTitle = NSAttributedString(
             string: lines.joined(separator: "\n"),
             attributes: [.foregroundColor: color, .font: NSFont.menuFont(ofSize: 12)])
+    }
+
+    /// "Waiting on phone" submenu: each item can be removed; the phone picks them up in Safari or Mail.
+    private func refreshOutbox() {
+        let items = controller.outboxItems
+        let preparing = controller.outboxPreparing
+        preparingLine.isHidden = preparing == 0
+        preparingLine.title = preparing == 1 ? "Preparing 1 file for the phone…" : "Preparing \(preparing) files for the phone…"
+
+        waitingItem.isHidden = items.isEmpty
+        waitingItem.title = "Waiting on Phone (\(items.count))"
+        let sub = waitingItem.submenu!
+        sub.removeAllItems()
+        sub.addItem(.sectionHeader(title: "Pick these up in Safari or Mail on the phone"))
+        for item in items.reversed() {
+            var title = item.name
+            if let d = item.duration { title += String(format: "  ▶ %d:%02d", Int(d.rounded()) / 60, Int(d.rounded()) % 60) }
+            let row = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+            row.image = NSImage(contentsOf: controller.outbox.dir.appendingPathComponent(item.thumb)).map { img in
+                let size = NSSize(width: 32, height: 32 * img.size.height / max(img.size.width, 1))
+                return NSImage(size: size, flipped: false) { r in img.draw(in: r); return true }
+            }
+            let actions = NSMenu()
+            let remove = NSMenuItem(title: "Remove", action: #selector(removeFromOutbox(_:)), keyEquivalent: "")
+            remove.target = self
+            remove.representedObject = item.id
+            actions.addItem(remove)
+            row.submenu = actions
+            sub.addItem(row)
+        }
+        sub.addItem(.separator())
+        let clear = NSMenuItem(title: "Remove All", action: #selector(clearOutbox), keyEquivalent: "")
+        clear.target = self
+        sub.addItem(clear)
+    }
+
+    @objc private func chooseFilesToSend() { controller.chooseFilesToSend() }
+    @objc private func removeFromOutbox(_ sender: NSMenuItem) {
+        if let id = sender.representedObject as? String { controller.outbox.remove(id) }
+    }
+    @objc private func clearOutbox() { controller.outbox.clear() }
+
+    // Dropping files onto the menu bar icon
+    func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        mediaURLs(sender).isEmpty ? [] : .copy
+    }
+    func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        let urls = mediaURLs(sender)
+        guard !urls.isEmpty else { return false }
+        controller.send(urls)
+        return true
+    }
+    private func mediaURLs(_ info: NSDraggingInfo) -> [URL] {
+        let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self],
+                                                       options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        return urls.filter { MediaConverter.kind(of: $0) != nil }
     }
 
     func menuWillOpen(_ menu: NSMenu) {
@@ -221,6 +306,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         4. Tap Save. If asked to set up without SSL, tap Yes.
 
         To send: in Photos, open a photo or video, tap Share > Email, send from retrodrop@mac.local to any address. Nothing leaves your network.
+
+        SENDING FROM THIS MAC TO THE PHONE
+        Choose Send Photos & Videos to Phone in the RetroDrop menu, or drop files onto the menu bar icon. RetroDrop converts them for old iPhones. Then on the phone:
+        • Safari: open the address above. Under From your Mac, tap a photo, then touch and hold it and tap Save Image. (Safari can play videos but not save them.)
+        • Mail: check mail in the RetroDrop account. Each photo or video arrives as an email. Touch and hold it to save it.
 
         If this Mac's address changes, update both Host Names in that account.
         """

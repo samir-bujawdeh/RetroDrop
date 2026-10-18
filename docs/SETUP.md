@@ -9,6 +9,7 @@ kinds of old iPhone. If you get stuck, jump to [Troubleshooting](#troubleshootin
 - [4a. Send with Safari (iOS 6 and later)](#4a-send-with-safari-ios-6-and-later)
 - [4b. Send with Mail (iOS 5 and earlier)](#4b-send-with-mail-ios-5-and-earlier)
 - [5. Get your photos](#5-get-your-photos)
+- [6. Send photos and videos to the phone](#6-send-photos-and-videos-to-the-phone)
 - [Keep your Mac's address from changing](#keep-your-macs-address-from-changing)
 - [Troubleshooting](#troubleshooting)
 
@@ -158,6 +159,23 @@ Files are named with the date and time they arrived, e.g. `20261018-143205-image
 overwritten.
 
 Choose **Stop Server** when you're done.
+
+## 6. Send photos and videos to the phone
+
+RetroDrop also works the other way round: from your Mac to the phone.
+
+1. In the RetroDrop menu, choose **Send Photos & Videos to Phone…**, or drop files onto the RetroDrop
+   menu bar icon. You can also right-click a file in Finder and choose **Open With → RetroDrop**.
+2. RetroDrop converts them so old iPhones can open them: photos become JPEGs (up to 2048 pixels),
+   and videos become 640×480 H.264, which plays even on an iPhone 3GS. **Waiting on Phone** in the menu
+   lists what's ready.
+3. On the phone, with RetroDrop's server running:
+   - **Safari** (any iOS version): open RetroDrop's address. Under **From your Mac**, tap a photo,
+     then touch and hold it and tap **Save Image**. Safari can play videos, but it can't save them.
+   - **Mail** (phones with the RetroDrop mail account): check mail in the RetroDrop account. Each
+     photo or video arrives as its own email. Touch and hold it to save it to your Camera Roll.
+
+Files stay in **Waiting on Phone** until you remove them, so several phones can pick them up.
 
 ## Keep your Mac's address from changing
 

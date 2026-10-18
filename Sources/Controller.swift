@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import UniformTypeIdentifiers
 
 struct Photo: Identifiable, Equatable {
     let url: URL
@@ -36,6 +37,14 @@ final class Controller: ObservableObject {
     @Published private(set) var allPhotos: [Photo] = []
     /// Paths received since the last Start, newest first.
     @Published private(set) var sessionPaths: [String] = []
+    /// Photos and videos waiting for the phone to pick up, oldest first.
+    @Published private(set) var outboxItems: [OutboxItem] = []
+    /// How many files are still being converted for the phone.
+    @Published private(set) var outboxPreparing = 0
+
+    /// `-outboxDir <path>` (a defaults argument) keeps tests away from the real outbox.
+    let outbox = UserDefaults.standard.string(forKey: "outboxDir")
+        .map { Outbox(dir: URL(fileURLWithPath: $0)) } ?? Outbox()
 
     var sessionPhotos: [Photo] {
         let byPath = Dictionary(allPhotos.map { ($0.url.path, $0) }, uniquingKeysWith: { a, _ in a })
@@ -65,6 +74,12 @@ final class Controller: ObservableObject {
         refreshIP()
         reloadFolder()
         watchFolder()
+        outbox.onChange = { [weak self] in
+            guard let self else { return }
+            self.outboxItems = self.outbox.snapshot()
+            self.outboxPreparing = self.outbox.preparingCount
+        }
+        outboxItems = outbox.snapshot()
     }
 
     // MARK: Servers
@@ -87,7 +102,7 @@ final class Controller: ObservableObject {
         for offset in 0..<Self.webPortAttempts {
             let (port, overflow) = preferred.addingReportingOverflow(offset)
             if overflow { break }
-            let web = TCPServer(port: port) { WebUpload.handle($0, saver: saver) }
+            let web = TCPServer(port: port) { [outbox] in WebUpload.handle($0, saver: saver, outbox: outbox) }
             do {
                 try web.start()
                 servers.append(web)
@@ -113,7 +128,7 @@ final class Controller: ObservableObject {
         var mailServers: [TCPServer] = []
         var mailErrors: [String] = []
         for server in [TCPServer(port: Self.smtpPort) { MailUpload.handleSMTP($0, saver: saver) },
-                       TCPServer(port: Self.popPort) { MailUpload.handlePOP($0) }] {
+                       TCPServer(port: Self.popPort) { [outbox] in MailUpload.handlePOP($0, outbox: outbox) }] {
             do {
                 try server.start()
                 mailServers.append(server)
@@ -158,6 +173,34 @@ final class Controller: ObservableObject {
     private func didSave(_ url: URL) {
         sessionPaths.insert(url.standardizedFileURL.path, at: 0)
         reloadFolder()
+    }
+
+    // MARK: Sending to the phone
+
+    /// Converts the files for old iPhones and queues them. Reports files that couldn't be added.
+    func send(_ urls: [URL]) {
+        outbox.add(urls) { failures in
+            guard !failures.isEmpty else { return }
+            let alert = NSAlert()
+            alert.messageText = failures.count == 1 ? "Couldn't send “\(failures[0].0)”"
+                                                    : "Couldn't send \(failures.count) files"
+            alert.informativeText = failures.map { "\($0.0): \($0.1)" }.joined(separator: "\n")
+            NSApp.activate(ignoringOtherApps: true)
+            alert.runModal()
+        }
+    }
+
+    func chooseFilesToSend() {
+        let panel = NSOpenPanel()
+        panel.title = "Choose photos and videos to send to your phone"
+        panel.prompt = "Send to Phone"
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = true
+        panel.allowedContentTypes = [.image, .movie]
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK else { return }
+        send(panel.urls)
     }
 
     // MARK: Folder

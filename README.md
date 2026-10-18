@@ -42,6 +42,9 @@ ready to drag onto your desktop or into any app.
   <picture><source media="(prefers-color-scheme: dark)" srcset="assets/menubar-running-dark.png"><img src="assets/menubar-running.png" width="36" alt="Running"></picture> running
 - **Works with phones from 2007 onwards**, using the two routes above.
 - **Photos and videos**, including long videos. Tested with 60 MB files.
+- **Send photos and videos back to the phone.** Choose *Send to Phone* or drop files on the menu bar icon.
+  RetroDrop converts them for old iPhones (HEIC → JPEG, 4K/HEVC → 640×480 H.264), and the phone picks
+  them up in Safari (photos) or Mail (photos and videos).
 - **A thumbnail grid in the menu.** Switch between *This session* and *All photos*, drag thumbnails out to
   copy them, or double-click to open. Videos show their length.
 - **Shows your Mac's address** with one-click copy, plus a built-in "How to Connect a Phone" guide.
